@@ -8,25 +8,27 @@
 }
 
 .showcase {
-	right: 0;
+	display: flex;
+	flex-flow: column-reverse nowrap;
 	width: 100%;
 	min-height: 100vh;
 	transition: 0.5s;
-	z-index: 2;
+	z-index: 0;
 	background: url("../header.jpg") center / cover no-repeat;
 }
 
 .menu {
-	position: relative;
+	position: absolute;
 	display: flex;
+	width: 100vw;
 	align-items: center;
 	justify-content: space-around;
 	background: rgba(0, 0, 0, 0.418);
+	z-index: 1;
 }
 .menu a {
 	flex: 1 1 auto;
 	font-size: 1em;
-
 	padding: 5px 30px;
 	text-align: center;
 	text-decoration: none;
@@ -42,10 +44,12 @@
 }
 
 .sidetext {
-	position: relative;
+	max-width: 30vh;
+	display: inline-flex;
+	flex-flow: column wrap;
 	z-index: 5;
-	padding-top: 10vh;
-	padding-left: 10vw;
+	padding-bottom: calc(5vh + 30px);
+	padding-left: 5vw;
 	background: transparent;
 }
 
@@ -74,7 +78,6 @@
 	background: transparent;
 }
 .sidetext a {
-	display: inline-block;
 	font-size: 1em;
 	background: #fff;
 	padding: 10px 30px;
@@ -92,20 +95,22 @@
 
 @media screen and (max-width: 700px) {
 	.sidetext h2 {
-		font-size: 2rem;
+		font-size: 2.5rem;
 	}
 
 	.sidetext h3 {
-		font-size: 1rem;
+		font-size: 1.5rem;
 	}
 
 	.sidetext p {
-		font-size: 0.6rem;
+		margin: 0;
+		font-size: 1rem;
 	}
 }
 .footer {
+	position: relative;
 	display: flex;
-	height: 50px;
+	height: 30px;
 	justify-content: flex-end;
 	align-items: center;
 	margin-top: -50px;
@@ -113,6 +118,5 @@
 	background: rgba(0, 0, 0, 0.5);
 	color: white;
 	font-size: 0.8rem;
-}
-.footer .span {
+	z-index: 10;
 }
