@@ -1,30 +1,20 @@
 <!DOCTYPE html>
 <html>
-<head>
-<link rel="stylesheet" href="stylesheets/index.css">
-</head>
+<%-include ("../partials/head.ejs") %>
 
 <body>
 
- <section>
- <div class="menu">
-        <a href="#">Portfolio</a>
-        <a class="middle" href="#">Michael Kendall</a>
-        <a href="#">Contact</a>
+    <div class="menu"><a href="#">Resources</a><a class="text-uppercase menu-middle" href="#">M.Kendall</a><a
+            href="#">Contact</a></div>
+    <div class="cust-hero">
+        <div class="cust-sidetxt">
+            <h2>This is</h2>
+            <h3>My Domain.</h3>
+            <p>I'm still figuring out the rest.</p><a class="btnExplore" href="#">EXPLORE</a>
+        </div>
     </div>
-    <div class="showcase">
-    <div class="sidetext">
-        <h2>This is</h2> 
-        <h3>My Domain.</h3>
-        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. In eius qui repellat, officiis similique repudiandae!</p>
-        <a href="#">Explore</a>
-    </div>
-    
-    </div>
-    <div class="footer">
-        <span>© Michael Kendall 2021. All Rights Reserved.</span>
-    </div>
-</section>
 
+    <%-include ("../partials/foot.ejs") %>
 </body>
+
 </html>
