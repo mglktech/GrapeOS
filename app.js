@@ -2,7 +2,7 @@ const express = require("express");
 const path = require("path");
 const morgan = require("morgan")("dev");
 const PORT = process.env.PORT || 5000;
-
+const CONCURRENCY = process.env.WEB_CONCURRENCY || 1;
 const apiRoutes = require("./routes/api");
 
 let app = express();
