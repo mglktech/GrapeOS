@@ -10,6 +10,9 @@
 
 Create a Projects section to mglk.tech where I can archive my own journey through Web Development in a way that can be easily read by employers.
 
+*This* is an example of how my articles will be displayed, it uses [markdown-it](https://www.npmjs.com/package/markdown-it ) (with a few extras) to produce the page contents from a file.
+The next stage is to get it working through [MongoDB Atlas](https://www.mongodb.com/try ) and [mongoose](https://www.npmjs.com/package/mongoose )
+
 ---
 #### Initial Requirements:
   
