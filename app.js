@@ -3,7 +3,9 @@ const path = require("path");
 const morgan = require("morgan")("dev");
 const PORT = process.env.PORT || 5000;
 const CONCURRENCY = process.env.WEB_CONCURRENCY || 1;
+
 const apiRoutes = require("./routes/api");
+const articleRoutes = require("./routes/articles");
 
 let app = express();
 // DEFAULT CONFIGS
@@ -21,6 +23,7 @@ app.use(async (req, res, next) => {
 app.get("/", (req, res) => res.render("pages/index")); // Index Routing
 
 app.use("/api", apiRoutes); // API Middleware scope
+app.use("/articles", articleRoutes); // API Middleware scope
 
 app.use((req, res) => {
 	// must manually set 404 status code
