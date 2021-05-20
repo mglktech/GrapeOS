@@ -64,7 +64,7 @@ code {
 }
 
 pre {
-	padding: 0.5rem;
+	margin: 1rem;
 	line-height: 1.25;
 	overflow-x: scroll;
 }
@@ -103,7 +103,6 @@ html {
 p,
 .modest-p {
 	font-size: 1rem;
-	margin-bottom: 1.3rem;
 }
 
 h1,
@@ -114,7 +113,6 @@ h3,
 .modest-h3,
 h4,
 .modest-h4 {
-	margin: 1.414rem 0 0.5rem;
 	font-weight: inherit;
 	line-height: 1.42;
 }
@@ -171,15 +169,8 @@ textarea {
 
 @import url(http://fonts.googleapis.com/css?family=Arimo:700,700italic);
 
-html {
-	font-size: 18px;
-	max-width: 100%;
-}
-
 body .articleContent {
-	position: relative;
 	line-height: 1.85;
-	top: 50px;
 	margin: 0 auto;
 	background: white;
 	color: #444;
@@ -188,6 +179,14 @@ body .articleContent {
 	line-height: 1.45;
 	max-width: 48rem;
 }
+body .articleContent p {
+	padding-left: 1em;
+	padding-right: 1em;
+	margin-block-start: 1em;
+	margin-block-end: 1em;
+	margin-inline-start: 0px;
+	margin-inline-end: 0px;
+}
 
 h1,
 h2,
@@ -195,16 +194,23 @@ h3,
 h4,
 h5,
 h6 {
+	margin-block-start: 0;
+	margin-block-end: 0;
+	margin-inline-start: 0px;
+	margin-inline-end: 0px;
 	font-family: Arimo, Helvetica, sans-serif;
 }
 
 h1,
 h2,
 h3 {
-	border-bottom: 2px solid #fafafa;
-	margin-bottom: 1.15rem;
-	padding-bottom: 0.5rem;
 	text-align: center;
+}
+
+h4,
+h5,
+h6 {
+	margin: 0 0.5em 0;
 }
 
 blockquote {
@@ -218,7 +224,7 @@ code {
 }
 
 table {
-	padding: 0;
+	padding: 1rem;
 }
 table tr {
 	border-top: 1px solid #cccccc;

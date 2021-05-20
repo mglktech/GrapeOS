@@ -5,9 +5,9 @@ const router = express.Router();
 const fs = require("fs");
 const hljs = require("highlight.js");
 const md = require("markdown-it")({
-	html: false,
+	html: true,
 	linkify: true,
-	typographer: true,
+	typographer: false,
 	highlight: function (str, lang) {
 		if (lang && hljs.getLanguage(lang)) {
 			try {
