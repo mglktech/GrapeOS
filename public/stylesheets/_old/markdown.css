@@ -174,12 +174,14 @@ body .articleContent {
 	margin: 0 auto;
 	background: white;
 	color: #444;
+
 	font-family: "Open Sans Condensed", sans-serif;
 	font-weight: 300;
 	line-height: 1.45;
 	max-width: 48rem;
 }
 body .articleContent p {
+	font-size: 1.5rem;
 	padding-left: 1em;
 	padding-right: 1em;
 	margin-block-start: 1em;

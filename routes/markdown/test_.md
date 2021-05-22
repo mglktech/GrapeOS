@@ -2,10 +2,6 @@
   
 ## Creating a Project Section 
   
-
-
----
-
 ### Objective
 
 Create a Projects section to mglk.tech where I can archive my own journey through Web Development in a way that can be easily read by employers.
@@ -24,7 +20,7 @@ The next stage is to get it working through [MongoDB Atlas](https://www.mongodb.
   
   
 #### Todos
-  
+- [ ] do something
 - [x] Install Initial Requirements
 - [x] Setup Config vars on Local AND Heroku
 - [x] Install [marked](https://www.npmjs.com/package/marked )
@@ -51,7 +47,7 @@ The next stage is to get it working through [MongoDB Atlas](https://www.mongodb.
   |**[resources]**|Array(*Resource._id*)|
   |**[labels]**|Array(*Labels._id*)|
 Example:
-```Javascript
+```javascript
 let Project = {
   
   "title":"Creating a Project Section",

@@ -90,3 +90,10 @@ a {
 	color: var(--purple);
 	text-decoration: none;
 }
+
+.login-dark {
+	height: 100vh;
+	background: url("/img/header1.jpg") center / cover, #475d62;
+	background-size: cover;
+	position: relative;
+}

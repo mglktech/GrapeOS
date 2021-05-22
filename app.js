@@ -6,6 +6,7 @@ const CONCURRENCY = process.env.WEB_CONCURRENCY || 1;
 
 const apiRoutes = require("./routes/api");
 const articleRoutes = require("./routes/articles");
+const demoRoutes = require("./routes/demos");
 
 let app = express();
 // DEFAULT CONFIGS
@@ -17,13 +18,15 @@ app.use(morgan); // VERBOSE CONSOLE LOGGING
 
 app.use(async (req, res, next) => {
 	// DEBUGGING
+	//console.log(req);
 	next();
 });
 
 app.get("/", (req, res) => res.render("pages/index")); // Index Routing
-
-app.use("/api", apiRoutes); // API Middleware scope
-app.use("/articles", articleRoutes); // API Middleware scope
+app.get("/login", (req, res) => res.render("pages/login"));
+app.use("/api", apiRoutes);
+app.use("/articles", articleRoutes);
+app.use("/demos", demoRoutes);
 
 app.use((req, res) => {
 	// must manually set 404 status code
