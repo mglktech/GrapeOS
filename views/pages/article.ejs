@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<%-include ("../partials/head.ejs") %>
+<head>
+<link rel="stylesheet" href="/stylesheets/markdown.css">
+</head>
+
+<body>
+    <%-include ("../partials/nav.ejs");%>
+    <main class="page">
+    <section class="article-content">
+        <img class="img-fluid" src="<%=article.headerImage%>" width="100%" style="border-radius: 5px 5px 0px 0px;">
+        <h1><strong><%=article.title%></strong></h1>
+        <%-article.body%>
+        </section>
+    </main>
+    <%-include ("../partials/foot.ejs") %>
+    <%-include ("../partials/scripts.ejs")%>
+</body>
+
+</html>

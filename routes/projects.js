@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../controllers/articles");
+const controller = require("../controllers/projects");
 const isAuth = require("../config/auth").isAuth;
 const isAdmin = require("../config/auth").isAdmin;
 //const marked = require("marked");
@@ -28,7 +28,7 @@ const md = require("markdown-it")({
 
 router.get("/test", controller.test);
 router.get("/new", isAdmin, controller.new_get);
-router.get("/:title", controller.article_get);
+router.get("/:title", controller.project_get);
 router.post("/new", isAdmin, controller.new_post);
 
 module.exports = router;
