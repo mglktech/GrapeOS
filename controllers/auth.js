@@ -52,6 +52,7 @@ const login_post = (req, res) => {
 	passport.authenticate("local", redirs),
 		function (req, res) {
 			console.log(`${req.user.username} has logged in.`);
+			res.redirect("/");
 		};
 };
 
