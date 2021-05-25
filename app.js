@@ -48,11 +48,11 @@ app.use(passport.session());
 
 app.use(async (req, res, next) => {
 	// DEBUGGING
-	console.log(req.session);
+	//console.log(req.session);
 	next();
 });
 
-app.get("/", (req, res) => res.render("pages/index")); // Index Routing
+app.get("/", (req, res) => res.render("pages/index", { sess: req.session })); // Index Routing
 app.use("/auth", authRoutes);
 app.use("/api", apiRoutes);
 app.use("/articles", articleRoutes);

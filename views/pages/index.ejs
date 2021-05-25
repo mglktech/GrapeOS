@@ -72,5 +72,8 @@
     <%-include ("../partials/foot.ejs") %>
     <%-include ("../partials/scripts.ejs")%>
 </body>
-
+<script>
+const sess = <%- JSON.stringify(sess) %>;
+console.log(sess);
+</script>
 </html>
