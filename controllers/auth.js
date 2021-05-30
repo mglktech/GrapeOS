@@ -44,21 +44,13 @@ const logout_get = (req, res) => {
 	res.redirect("/");
 };
 
-const login_post = (req, res) => {
-	const redirs = {
-		successRedirect: "/",
-		failureRedirect: "/login?err=true",
-	};
-	passport.authenticate("local", redirs),
-		function (req, res) {
-			console.log(`${req.user.username} has logged in.`);
-			res.redirect("/");
-		};
+const loginSuccess_get = (req, res) => {
+	res.render("pages/login-success");
 };
 
 module.exports = {
 	login_get,
 	logout_get,
-	login_post,
+	loginSuccess_get,
 	setup,
 };

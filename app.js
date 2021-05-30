@@ -62,7 +62,7 @@ app.use("/demos", demoRoutes);
 app.use((req, res) => {
 	// must manually set 404 status code
 	//res.status(404).sendFile(`${path}404.html`, { root });
-	res.status(404).send("404 Page Not Found.");
+	res.render("./pages/404");
 });
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));

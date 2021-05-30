@@ -10,5 +10,9 @@ module.exports.isAdmin = async (req, res, next) => {
 		next();
 		return;
 	}
-	res.status(404).send("You are not authorised to view this content.");
+	res
+		.status(404)
+		.send(
+			"You are not authorised to view this content. (you are not an admin)"
+		);
 };
