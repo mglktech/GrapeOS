@@ -3,6 +3,10 @@ module.exports.isAuth = async (req, res, next) => {
 		next();
 		return;
 	}
+	console.log(
+		"A User tried to load a page that was restricted. Their session details are as follows: "
+	);
+	console.log(req.session);
 	res.redirect("/auth/login");
 };
 module.exports.isAdmin = async (req, res, next) => {
