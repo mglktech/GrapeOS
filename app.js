@@ -21,7 +21,7 @@ let app = express();
 let string = "";
 // DEFAULT CONFIGS
 app.use(express.static(path.join(__dirname, "public"))); // PUBLIC STATIC DIRECTORY
-app.use(express.urlencoded({ extended: false })); // EXTENDED URLENCODING FOR FORMS
+app.use(express.urlencoded({ extended: true })); // EXTENDED URLENCODING FOR FORMS
 app.set("views", path.join(__dirname, "views")); // set views directory
 app.set("view engine", "ejs"); // set view engine
 app.use(morgan); // VERBOSE CONSOLE LOGGING

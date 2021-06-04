@@ -25,7 +25,7 @@ const md = require("markdown-it")({
 // const createDomPurify = require("dompurify");
 // const { JSDOM } = require("jsdom");
 // const dompurify = createDomPurify(new JSDOM.window());
-
+router.get("/", controller.index_get);
 router.get("/test", controller.test);
 router.get("/new", isAdmin, controller.new_get);
 router.get("/:title", controller.project_get);

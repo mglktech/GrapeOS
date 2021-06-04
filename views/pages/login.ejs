@@ -4,7 +4,7 @@
 <body>
 <%-include ("../partials/nav.ejs") %>
 <section class="login-clean">
-        <form method="post">
+        <form action="/auth/login" method="post">
             <h2 class="visually-hidden">Login Form</h2>
             <div class="illustration"><i class="icon ion-log-in"></i></div>
             <div class="mb-3"><input class="form-control" type="text" name="username" placeholder="Username"></div>

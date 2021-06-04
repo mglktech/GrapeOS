@@ -1,20 +1,39 @@
 const Project = require("../models/project-model");
-const fs = require("fs");
 const hljs = require("highlight.js");
-const md = require("markdown-it")({
-	html: true,
-	linkify: true,
-	typographer: true,
-	highlight: function (str, lang) {
-		if (lang && hljs.getLanguage(lang)) {
-			try {
-				return hljs.highlight(lang, str).value;
-			} catch (__) {}
-		}
+// const md = require("markdown-it")({
+// 	html: true,
+// 	linkify: true,
+// 	typographer: true,
+// 	highlight: function (str, lang) {
+// 		if (lang && hljs.getLanguage(lang)) {
+// 			try {
+// 				return hljs.highlight(lang, str).value;
+// 			} catch (__) {}
+// 		}
 
-		return ""; // use external default escaping
-	},
-}).use(require("markdown-it-checkbox"));
+// 		return ""; // use external default escaping
+// 	},
+// }).use(require("markdown-it-checkbox"));
+
+// Blog.find()
+// 		.sort({ createdAt: -1 }) // sort by created descending
+// 		.then((result) => {
+// 			res.render("blogs/index", { title: "Blogs", blogs: result });
+// 		})
+// 		.catch((err) => {
+// 			console.log(err);
+// 		});
+
+const index_get = (req, res) => {
+	Project.find()
+		.sort({ createdAt: -1 })
+		.then((projects) => {
+			res.render("./pages/projects", { projects });
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+};
 
 const test = (req, res) => {
 	res.send("Projects Route Test");
@@ -59,4 +78,4 @@ const project_get = (req, res) => {
 		});
 };
 
-module.exports = { test, new_get, new_post, project_get };
+module.exports = { index_get, test, new_get, new_post, project_get };
