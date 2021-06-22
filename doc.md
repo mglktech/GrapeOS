@@ -1,6 +1,13 @@
-# Site Plan
+# Project Plan
+### My Website
 
-## Home
+Objective:
+Design, create, deploy a website to a custom domain for use as a personal portfolio.
+
+Target Audience:
+Prospective future employers, HR managers of small/medium-sized tech businesses primarily, Software architects,
+
+### Home
 Large hero style introductory section header introducing myself as a Web Developer and a Fire Spinner
 
 ### /firespinning

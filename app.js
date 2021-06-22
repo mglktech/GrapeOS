@@ -7,6 +7,7 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const passport = require("passport");
 
+const topLevelRoutes = require("./routes/top-level-routes");
 const authRoutes = require("./routes/auth");
 const apiRoutes = require("./routes/api");
 const articleRoutes = require("./routes/articles");
@@ -52,7 +53,8 @@ app.use(async (req, res, next) => {
 	next();
 });
 
-app.get("/", (req, res) => res.render("pages/index", { sess: req.session })); // Index Routing
+// Index Routing
+app.use("/", topLevelRoutes);
 app.use("/auth", authRoutes);
 app.use("/api", apiRoutes);
 app.use("/articles", articleRoutes);
