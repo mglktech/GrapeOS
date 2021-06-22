@@ -1,18 +1,27 @@
-<!DOCTYPE html>
+
 <html>
-<%-include ("../partials/head.ejs") %>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>GrapeOS</title>
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Code:400,500,700">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,500,700">
+    <link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+
 <body>
-<%-include ("../partials/nav.ejs") %>
-<section class="login-clean">
-        <form action="/auth/login" method="post">
-            <h2 class="visually-hidden">Login Form</h2>
-            <div class="illustration"><i class="icon ion-log-in"></i></div>
-            <div class="mb-3"><input class="form-control" type="text" name="username" placeholder="Username"></div>
-            <div class="mb-3"><input class="form-control" type="password" name="password" placeholder="Password"></div>
-            <div class="mb-3"><button class="btn btn-primary d-block w-100" type="submit">Log In</button></div><a class="forgot" href="/contact">Forgot your email or password?</a>
-        </form>
-    </section>
-<%-include ("../partials/foot.ejs") %>
+    <form class="login-form" action="/auth/login" method="post">
+        <div class="form-row"><img src="/assets/img/Emoji.svg" width="100px" height="100px"><span class="sp-brand">&lt;grapeOS/&gt;</span></div>
+        <div class="form-row">
+            <div><img src="/assets/img/vs_profile.svg"><span>Sign in</span></div>
+        </div>
+        <div class="form-row"><input class="form-control" type="text" name="username" placeholder="Username"></div>
+        <div class="form-row"><input class="form-control" type="password" name="password" placeholder="Password"></div>
+        <div><button class="btn btn-dark" type="submit">Sign In</button></div>
+    </form>
+    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
 
 </html>

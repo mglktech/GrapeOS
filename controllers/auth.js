@@ -7,7 +7,7 @@ const setup = async (req, res) => {
 	// if (exists) {
 	// 	console.log("Admin account already exists!");
 	// 	res.redirect("/login");
-	// 	return;
+	// 	return; 
 	// }
 	const saltHash = genPassword(process.env.super_PASSWORD);
 	const salt = saltHash.salt;
@@ -18,6 +18,8 @@ const setup = async (req, res) => {
 		salt: salt,
 		admin: true,
 	});
+
+	
 	console.log(`Creating admin account:`);
 	console.log(newUser);
 	newUser
