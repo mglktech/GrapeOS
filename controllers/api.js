@@ -26,7 +26,7 @@ const fivem_get = (req, res) => {
 			// let map = new Map(Object.entries(data.vars));
 			// console.log(map);
 			// data.vars = Object.fromEntries(map);
-
+			CaptureServerInfo(ip, data);
 			res.json(data);
 		})
 		.catch((err) => {
