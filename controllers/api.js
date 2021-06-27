@@ -4,7 +4,7 @@ const Discord = require("discord.js");
 const client = new Discord.Client({ _tokenType: "" });
 const token = process.env.discord_token;
 const guildID = process.env.guild_id;
-const ip = process.env.fivem_ip;
+const ip = process.env.fivem_ip_hl;
 const srv = new FiveM_Module.Server(ip);
 
 const serverModel = require("../models/server-model");
@@ -53,6 +53,10 @@ const fivem_getPlayerCount = async (req, res) => {
 
 const fivem_getPlayersAll = async (req, res) => {
 	const playerData = await GetPlayers(srv);
+	if (playerData.length === 0) {
+		res.send("Server Offline");
+		return;
+	}
 	const srv_currentlyOnline = [];
 	const server = await serverModel.findOne({ ip }).exec();
 	playerData.forEach(async (player) => {
@@ -284,8 +288,12 @@ const GetPlayers = (srv) => {
 			return data;
 		})
 		.catch((err) => {
+			if (err.code === "ECONNABORTED") {
+				console.log(`Error connecting to server at url: ${err.config.url}`);
+				return [];
+			}
 			console.log(err);
-			return null;
+			return [];
 		});
 };
 
