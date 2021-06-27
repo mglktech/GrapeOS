@@ -19,19 +19,10 @@ const fivem_get = (req, res) => {
 	srv
 		.getInfo()
 		.then((data) => {
-			// for (let [key, value] of Object.entries(data.vars)) {
-			// 	console.log(`Key: [${key}]`);
-			// 	console.log(`Value: ${value}`);
-			// }
-			// let map = new Map(Object.entries(data.vars));
-			// console.log(map);
-			// data.vars = Object.fromEntries(map);
-			CaptureServerInfo(ip, data);
 			res.json(data);
 		})
 		.catch((err) => {
 			console.log(`ERROR: \n ${err}`);
-			if (err.code == "ECONNABORTED");
 			res.json(err);
 		});
 };
@@ -52,11 +43,13 @@ const fivem_getPlayerCount = async (req, res) => {
 };
 
 const fivem_getPlayersAll = async (req, res) => {
-	const playerData = await GetPlayers(srv);
-	if (playerData.length === 0) {
-		res.send("Server Offline");
+	// first, pull/make new server
+	const serverInfo = await updateServerInfo(ip); //
+	if (!serverInfo) {
+		res.json({ error: "Server Offline" });
 		return;
 	}
+	const playerData = await GetPlayers(srv);
 	const srv_currentlyOnline = [];
 	const server = await serverModel.findOne({ ip }).exec();
 	playerData.forEach(async (player) => {
@@ -72,6 +65,8 @@ const fivem_getPlayersAll = async (req, res) => {
 	});
 };
 
+const findPlayer = () => {};
+
 async function chkActivity(sv_online, server) {
 	const curTime = Date.now();
 	const db_online = await activityModel
@@ -79,6 +74,7 @@ async function chkActivity(sv_online, server) {
 		.exec();
 	//console.log(db_online);
 	let count = 1;
+	// What if server goes offline??? Must set all existing online to offline if that is the case.
 	sv_online.forEach(async (id) => {
 		const player = await playerModel.findById(id).exec();
 		const exists = db_online.some((record) => {
@@ -147,35 +143,6 @@ async function CreateActivityModel(server, player) {
 	return newActivityModel;
 }
 
-// async function pruneFormerlyOnline(sv_online, server) {
-// 	const db_online = await activityModel
-// 		.find({ server, currentlyOnline: true }, { player: 1, _id: 1 })
-// 		.exec(); // return all players listed as online currently in DB
-// 	db_online.forEach(async (record) => {
-// 		const playerID = record.player._id.toString();
-// 		const isReallyOnline = sv_online.includes(playerID);
-// 		if (!isReallyOnline) {
-// 			console.log(`${playerID} does not appear to be online any more`);
-// 			await activityModel
-// 				.findOneAndUpdate(
-// 					{ _id: record._id },
-// 					{
-// 						offlineAt: Date.now(),
-// 						currentlyOnline: false,
-// 					}
-// 				)
-// 				.exec();
-// 			return;
-// 		}
-// 		return;
-// 	});
-// }
-
-async function CompareWhoIsOnline(ip, sv_online) {}
-// const currentlyOnline = await activityModel
-// 	.find({ currentlyOnline: true })
-// 	.exec();
-
 //{"endpoint":"127.0.0.1","id":69,"identifiers":["steam:11000013c929d44","license:d218507f7cd94c1db39282d472dd7b5d3d81149e","xbl:2535471629942129","live:914798172291422","discord:780633822081056769","fivem:1625291","license2:d218507f7cd94c1db39282d472dd7b5d3d81149e"],"name":"Obama","ping":105},
 
 //{"endpoint":"127.0.0.1","id":9,"identifiers":["steam:11000014734ec8d","license:d218507f7cd94c1db39282d472dd7b5d3d81149e","xbl:2535412091651842","live:914798291850613","discord:558737326147239937","fivem:1625291","license2:d218507f7cd94c1db39282d472dd7b5d3d81149e"],"name":"Solar","ping":105}
@@ -191,8 +158,6 @@ const fivem_getOnline = (req, res) => {
 			res.json(err);
 		});
 };
-
-const NewFunc = () => {};
 
 const CapturePlayerInfo = async (player) => {
 	// first compare player identifiers to database (singular)
@@ -251,7 +216,66 @@ const compareObjects = (o1, o2) => {
 	return true;
 };
 
+async function findServer(ip) {
+	return await serverModel.findOne({ ip }).exec();
+}
+
+async function createServer(ip, data) {
+	let vars = new Map(Object.entries(data.vars));
+	const sv = await new serverModel({
+		ip,
+		info: {
+			enhancedHostSupport: data.enhancedHostSupport,
+			icon: data.icon,
+			resources: data.resources,
+			server: data.server,
+			vars,
+			version: data.version,
+		},
+	}).save();
+	return sv;
+}
+const getServerInfo = async (srv) => {
+	return await srv
+		.getInfo()
+		.then((data) => {
+			return data;
+		})
+		.catch((err) => {
+			console.log(err);
+			return null;
+		});
+};
+
+async function updateServerInfo(ip) {
+	const data = await getServerInfo(srv); // srv is top-level defined
+	if (!data) {
+		console.log("[FiveM_API] Error: could not retrieve server info");
+		return null;
+	}
+	let server = await findServer(ip);
+	if (!server) {
+		server = await createServer(ip, data);
+	}
+
+	let vars = new Map(Object.entries(data.vars));
+	let new_data = {
+		info: {
+			enhancedHostSupport: data.enhancedHostSupport,
+			icon: data.icon,
+			resources: data.resources,
+			server: data.server,
+			vars,
+			version: data.version,
+		},
+	};
+	//console.log(new_data);
+	serverModel.findByIdAndUpdate(server._id, new_data).exec();
+	return data;
+}
+
 const CaptureServerInfo = async (ip, data) => {
+	// now updateServerInfo
 	const mongoData = await serverModel
 		.findOne({ ip })
 		.then((result) => {
