@@ -13,6 +13,7 @@ const apiRoutes = require("./routes/api");
 const articleRoutes = require("./routes/articles");
 const projectRoutes = require("./routes/projects");
 const demoRoutes = require("./routes/demos");
+const { resolveInclude } = require("ejs");
 
 require("dotenv").config();
 require("./config/db");
@@ -68,3 +69,5 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+require("./config/api/discord.js");

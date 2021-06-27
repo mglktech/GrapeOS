@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>GrapeOS</title>
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Code:400,500,700">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,500,700">
+    <link rel="stylesheet" href="/css/file_style.css">
+</head>
+
+<body>
+    <div class="file_page">
+        <h2>Stub for HighLife Status</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>ID</th>
+                    <th>Info</th>
+                </tr>
+            </thead>
+            <tbody id="myTable">
+            </tbody>
+        </table>
+
+        <script>
+            const UpdateOnce = () => {
+                const textPlayerCount = document.getElementById("playerCount");
+                const stat = fetch("/api/fivem").then((data) => {
+                    data.json().then((res) => {
+                        buildTable(res);
+                        //Update();
+                    })
+                });
+            }
+            const Update = () => {
+                const textPlayerCount = document.getElementById("playerCount");
+                setInterval(() => {
+                    const stat = fetch("/api/fivem").then((data) => {
+                        data.json().then(res => buildTable(res))
+                    });
+                }, 5000)
+            }
+            const buildTable = (data) => {
+                const table = document.getElementById("myTable");
+                table.innerHTML = "";
+                data.forEach((row) => {
+                    //console.log(`ID: ${row.id} STEAM: ${row.identifiers[0]}`);
+                    var discordID = row.identifiers.find((id) => {
+                        var DiscordID = id.startsWith("discord");
+                        return DiscordID;
+                    });
+                    var SteamID = row.identifiers.find((id) => {
+                        var SteamID = id.startsWith("steam");
+                        return SteamID;
+                    });
+                    var row = `<tr>
+                    <td>${row.name}</td>
+                    <td>${row.id}</td>
+                    <td><a class="tbl-info"><img src='/assets/img/bi_arrow-up-right-square-fill.svg'></a></td>
+                    </tr>`;
+                    // <td>${SteamID || " "}</td>
+                    // <td>${discordID || " "}</td>
+                    table.innerHTML += row;
+                })
+            }
+            UpdateOnce();
+        </script>
+</body>
+
+</html>

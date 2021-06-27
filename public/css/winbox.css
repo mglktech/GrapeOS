@@ -1,6 +1,8 @@
 .winbox {
-	background: linear-gradient(-90deg, rgba(38, 21, 67, 1), rgba(21, 94, 77, 1));
-	border-radius: 5px;
+	background: #564074;
+	border-radius: 1px;
+	border: 1px solid;
+	border-color: #564074;
 
 	/*box-shadow: none;*/
 }
@@ -56,5 +58,5 @@
 }
 .wb-body {
 	background-color: rgba(38, 21, 67, 1);
-	padding: 10px 10px 10px 10px;
+	/* padding: 10px 10px 10px 10px; */
 }
