@@ -47,6 +47,7 @@ const fivem_getPlayersAll = async (req, res) => {
 	const serverInfo = await updateServerInfo(ip); //
 	if (!serverInfo) {
 		res.json({ error: "Server Offline" });
+		// set everyone offline in database?
 		return;
 	}
 	const playerData = await GetPlayers(srv);
@@ -243,9 +244,41 @@ const getServerInfo = async (srv) => {
 		})
 		.catch((err) => {
 			console.log(err);
+			if (err.code === "ECONNABORTED") {
+				console.log(
+					"Server connection aborted after 1 second timeout. Taking players offline..."
+				);
+				OfflineEveryone(srv);
+			}
+			if (err.code === "ECONNRESET") {
+				console.log("Server connection is unsteady...");
+			}
 			return null;
 		});
 };
+
+async function OfflineEveryone(srv) {
+	const now = Date.now();
+	const server = await findServer(srv.ip);
+	const records = await activityModel
+		.find({ server, currentlyOnline: true })
+		.exec();
+	records.forEach(async (record) => {
+		const mod = await activityModel.findOne({ _id: record._id }).exec();
+		const duration = now - mod.onlineAt;
+		activityModel
+			.findByIdAndUpdate(record._id, {
+				offlineAt: now,
+				duration,
+				currentlyOnline: false,
+			})
+			.exec();
+		const player = await getPlayer(record.player);
+		console.log(
+			`${player.name} (${player._id}) has gone offline due to server not responding`
+		);
+	});
+}
 
 async function updateServerInfo(ip) {
 	const data = await getServerInfo(srv); // srv is top-level defined
