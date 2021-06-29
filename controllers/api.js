@@ -243,20 +243,23 @@ const getServerInfo = async (srv) => {
 			return data;
 		})
 		.catch((err) => {
-			//console.log(err);
 			if (err.code === "ECONNABORTED") {
 				console.log(
 					"[FiveM] Error ECONNABORTED, Server software caused connection abort"
 				);
+				return null;
 				//OfflineEveryone(srv);
 			}
 			if (err.code === "ECONNRESET") {
 				console.log("[FiveM] Error ECONNRESET, Server connection unsteady!");
+				return null;
 			}
 			if (err.code === "ECONNREFUSED") {
 				OfflineEveryone(srv);
 				console.log("[FiveM] Error ECONNREFUSED. Server probably offline.");
+				return null;
 			}
+			console.log(err);
 			return null;
 		});
 };
