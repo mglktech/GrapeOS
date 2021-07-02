@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const FiveM = require("../controllers/api/fivem.js"); // "../controllers/api/fivem"
 const Db = require("../controllers/api/db.js");
+const discord = require("../controllers/api/discord");
 
 router.get("/", FiveM.index_get);
 router.get("/fivem", FiveM.fivem_get);
@@ -15,5 +16,5 @@ router.get("/winbox/hl", (req, res) => {
 router.get("/winbox/btns", (req, res) => {
 	res.render("pages/btns");
 });
-router.get("/discord", (req, res) => {});
+router.get("/discord/:guildId/:playerId", discord.player_get);
 module.exports = router;

@@ -6,7 +6,7 @@ const CONCURRENCY = process.env.WEB_CONCURRENCY || 1;
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const passport = require("passport");
-
+const logger = require("emberdyn-logger");
 const topLevelRoutes = require("./routes/top-level-routes");
 const authRoutes = require("./routes/auth");
 const apiRoutes = require("./routes/api");
@@ -68,6 +68,6 @@ app.use((req, res) => {
 	res.render("./pages/404");
 });
 
-app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+app.listen(PORT, () => logger.system(`Listening on ${PORT}`));
 
 require("./config/api/discord.js");

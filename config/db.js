@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const logger = require("emberdyn-logger");
 /**
  * -------------- DATABASE ----------------
  */
@@ -18,7 +19,7 @@ const connection = mongoose
 		useUnifiedTopology: true,
 	})
 	.then(() => {
-		console.log("Database Connected.");
+		logger.database(`[MONGOOSE]: Database Connected.`);
 		mongoose.set("useFindAndModify", false);
 	})
 	.catch((err) => {

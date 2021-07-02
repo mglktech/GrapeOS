@@ -6,7 +6,7 @@ const activityModel = require("../../models/activity-model");
 const ip = process.env.fivem_ip_hl;
 const FiveM_Module = require("../../config/api/fivem");
 const srv = new FiveM_Module.Server(ip);
-
+const logger = require("emberdyn-logger");
 const index_get = (req, res) => {
 	res.sendStatus(200);
 };
@@ -18,25 +18,25 @@ const fivem_get = (req, res) => {
 			res.json(data);
 		})
 		.catch((err) => {
-			console.log(`ERROR: \n ${err}`);
+			logger.fatal(`${err}`);
 			res.json(err);
 		});
 };
-const fivem_getPlayerCount = async (req, res) => {
-	let first = await srv
-		.getPlayers()
-		.then((data) => {
-			return data;
-		})
-		.catch((err) => {
-			if (err.code == "ECONNABORTED");
-			//res.json(err);
-		});
-	let second = await srv.getMaxPlayers().then((data) => {
-		return data;
-	});
-	res.json({ playerCount: first, maxPlayers: second });
-};
+// const fivem_getPlayerCount = async (req, res) => {
+// 	let first = await srv
+// 		.getPlayers()
+// 		.then((data) => {
+// 			return data;
+// 		})
+// 		.catch((err) => {
+// 			if (err.code == "ECONNABORTED");
+// 			//res.json(err);
+// 		});
+// 	let second = await srv.getMaxPlayers().then((data) => {
+// 		return data;
+// 	});
+// 	res.json({ playerCount: first, maxPlayers: second });
+// };
 
 const fivem_getPlayersAll = async (req, res) => {
 	// first, pull/make new server
@@ -103,23 +103,23 @@ const getServerInfo = async (srv) => {
 		})
 		.catch((err) => {
 			if (err.code === "ECONNABORTED") {
-				console.log(
+				logger.error(
 					"[FiveM] Error ECONNABORTED, Server software caused connection abort"
 				);
 				return null;
 				//OfflineEveryone(srv);
 			}
 			if (err.code === "ECONNRESET") {
-				console.log("[FiveM] Error ECONNRESET, Server connection unsteady!");
+				logger.error("[FiveM] Error ECONNRESET, Server connection unsteady!");
 				return null;
 			}
 			if (err.code === "ECONNREFUSED") {
 				OfflineEveryone(srv);
-				console.log("[FiveM] Error ECONNREFUSED. Server probably offline.");
+				logger.error("[FiveM] Error ECONNREFUSED. Server probably offline.");
 				return null;
 			}
 			if (err.code === "ENOTFOUND") {
-				console.log(
+				logger.error(
 					`[FiveM] Error ENOTFOUND. No server found at ${err.config.url}`
 				);
 				return null;
@@ -146,7 +146,7 @@ async function OfflineEveryone(srv) {
 			})
 			.exec();
 		const player = await getPlayer(record.player);
-		console.log(
+		logger.event(
 			`${player.name} (${player._id}) has gone offline due to server not responding`
 		);
 	});
@@ -155,7 +155,7 @@ async function OfflineEveryone(srv) {
 async function updateServerInfo(ip) {
 	const data = await getServerInfo(srv); // srv is top-level defined
 	if (!data) {
-		console.log("[FiveM_API] Error: could not retrieve server info");
+		logger.warn("[FiveM_API] Error: could not retrieve server info");
 		return null;
 	}
 	let server = await findServer(ip);
@@ -187,7 +187,7 @@ const GetPlayers = (srv) => {
 		})
 		.catch((err) => {
 			if (err.code === "ECONNABORTED") {
-				console.log(`Error connecting to server at url: ${err.config.url}`);
+				logger.error(`Error connecting to server at url: ${err.config.url}`);
 				return [];
 			}
 			console.log(err);
@@ -210,7 +210,7 @@ const CapturePlayerInfo = async (player) => {
 		})
 			.save()
 			.then((result) => {
-				console.log(`${result.name} (${result._id}) has been discovered!`);
+				logger.database(`${result.name} (${result._id}) has been discovered!`);
 				return result._id;
 			});
 		return model._id;
@@ -227,7 +227,7 @@ const CapturePlayerInfo = async (player) => {
 				identifiersArray: player.identifiers,
 			})
 			.exec();
-		console.log(`${player.name} has had their licenses updated.`);
+		logger.database(`${player.name} has had their licenses updated.`);
 	}
 	return database._id;
 };
@@ -269,7 +269,7 @@ async function CreateActivityModel(server, player) {
 		onlineAt,
 		currentlyOnline: true,
 	}).save();
-	console.log(
+	logger.info(
 		`${newActivityModel.player.name} (${player._id}) has come online`
 	);
 	return newActivityModel;
@@ -288,7 +288,7 @@ async function UpdateActivityModel(server, sv_online) {
 		});
 		if (!exists) {
 			const player = await getPlayer(record.player);
-			console.log(`${player.name} (${player._id}) has gone offline`);
+			logger.info(`${player.name} (${player._id}) has gone offline`);
 			const mod = await activityModel.findOne({ _id: record._id }).exec();
 			const duration = now - mod.onlineAt;
 			const model = await activityModel
@@ -337,5 +337,4 @@ module.exports = {
 	fivem_get,
 	fivem_getPlayersAll,
 	fivem_getOnline,
-	fivem_getPlayerCount,
 };
