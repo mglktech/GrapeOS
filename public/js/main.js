@@ -1,6 +1,7 @@
 const about = document.querySelector("#about");
 const login = document.querySelector("#login");
 const hlStatus = document.querySelector("#hl-status");
+const test = document.querySelector("#test");
 
 const time = document.querySelector("#time");
 const date = document.querySelector("#date");
@@ -58,6 +59,14 @@ hlStatus.addEventListener("click", () => {
 		width: "400px",
 		height: "400px",
 		url: "/api/winbox/hl",
+	});
+});
+test.addEventListener("click", () => {
+	const box = winBox({
+		title: "Buttons",
+		width: "400px",
+		height: "400px",
+		url: "/api/winbox/btns",
 	});
 });
 
