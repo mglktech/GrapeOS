@@ -29,16 +29,17 @@ const fivem_get = async (req, res) => {
 		res.send("Error: No such server");
 		return;
 	}
+
 	const playerInfos = await getPlayersFromIps(server.fiveM.ips);
 	if (!playerInfos) {
 		res.send("Server Offline");
 		return;
 	}
+	res.send("success");
 	const players = await findPlayers(server._id, playerInfos);
 	findDiscords(players, server._id);
 	database.updateActivity(players, serverId);
 	//console.log(discords);
-	res.send("success");
 };
 
 const findDiscords = async (players, id_server) => {
