@@ -1,27 +1,14 @@
 require("dotenv").config();
-
-const serverModel = require("../../models/server-model");
-const playerModel = require("../../models/player-model");
-const activityModel = require("../../models/activity-model");
-const ip = process.env.fivem_ip_hl;
 const FiveM_Module = require("../../config/api/fivem");
+const ip = process.env.fivem_ip_hl;
 const srv = new FiveM_Module.Server(ip);
 const logger = require("emberdyn-logger");
-const index_get = (req, res) => {
-	res.sendStatus(200);
-};
 
-const fivem_get = (req, res) => {
-	srv
-		.getInfo()
-		.then((data) => {
-			res.json(data);
-		})
-		.catch((err) => {
-			logger.fatal(`${err}`);
-			res.json(err);
-		});
-};
+const index_get = (req, res) => {};
+
+/// LOW LEVEL DATABASE ACCESS FUNCTIONS SHOULD BE PLACED IN CONFIG.
+
+const fivem_get = (req, res) => {};
 // const fivem_getPlayerCount = async (req, res) => {
 // 	let first = await srv
 // 		.getPlayers()
@@ -239,6 +226,7 @@ const MapIdentifiers = (identifiers) => {
 		const split = id.split(":");
 		map.push(split);
 	});
+	l;
 	return new Map(map);
 };
 

@@ -10,7 +10,49 @@ const Schema = mongoose.Schema;
 
 const modelName = "Server"; // Singular, not sure if capitals are relevant
 // make schema, defines structure
-const mySchema = new Schema(
+
+const mySchema = new Schema({
+	fiveM: {
+		ips: [String],
+		resources: [String],
+		enhancedHostSupport: Boolean,
+		icon: String,
+		server: String,
+		vars: {
+			type: Map,
+			of: String,
+		},
+	},
+	discord: {
+		id: String,
+		name: String,
+		icon: String,
+		splash: String,
+		discoverySplash: String,
+		region: String,
+		memberCount: Number,
+		large: Boolean,
+		deleted: Boolean,
+		features: Array,
+		vanityUrlCode: String,
+		description: String,
+		banner: String,
+		ownerID: String,
+		roles: [
+			{
+				id: String,
+				name: String,
+				color: Number,
+				hoist: Boolean,
+				rawPosition: Number,
+				managed: Boolean,
+				mentionable: Boolean,
+				deleted: Boolean,
+			},
+		],
+	},
+});
+const myOldSchema = new Schema(
 	{
 		ip: String,
 		online: Boolean,
@@ -51,7 +93,6 @@ const mySchema = new Schema(
 	},
 	{ timestamps: true }
 );
-
 // create model based on schema
 const model = mongoose.model(modelName, mySchema);
 

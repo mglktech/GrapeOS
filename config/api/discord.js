@@ -7,26 +7,84 @@ const logger = require("emberdyn-logger");
 client.login(token);
 client.on("ready", async () => {
 	logger.access(`[DISCORD]: Logged in as ${client.user.tag}!`);
-	//const test = await fetchMember(guildID, "252894159713730560");
-	//const test = await fetchRoles(guildID);
+	//const guild = await client.guilds.fetch(guildID);
+	//const test = await client.fetchMember(guild, "252894159713730560");
+	//const role = await client.fetchRole(guild, "534477447069171727");
 	//console.log(test);
 });
-const fetchMember = async (guildID, playerID) => {
+
+client.fetchGuild = (guildID) => {
+	return client.guilds
+		.fetch(guildID)
+		.then((guild) => {
+			return {
+				id: guild.id,
+				name: guild.name,
+				icon: guild.icon,
+				splash: guild.splash,
+				discoverySplash: guild.discoverySplash,
+				region: guild.region,
+				memberCount: guild.memberCount,
+				large: guild.large,
+				deleted: guild.deleted,
+				features: guild.features,
+				vanityUrlCode: guild.vanityURLCode,
+				description: guild.description,
+				banner: guild.banner,
+				ownerid: guild.ownerID,
+			};
+		})
+		.catch((err) => HandleErrors("client.fetchGuild", err));
+};
+
+client.fetchMember = async (guildID, playerID) => {
 	const guild = await client.guilds.fetch(guildID);
+	const now = Date.now();
 	return await guild.members
 		.fetch(playerID)
 		.then((member) => {
-			return member;
+			return {
+				user: {
+					id: member.user.id,
+					username: member.user.username,
+					discriminator: member.user.discriminator,
+					avatar: member.user.avatar,
+				},
+				nickname: member.nickname,
+				roles: member._roles,
+				deleted: member.deleted,
+				joined: member.joinedTimestamp,
+				_dateUpdated: now,
+			};
 		})
 		.catch((err) => {
-			console.log(`ERROR!: ${err}`);
-			return null;
+			if (err != "DiscordAPIError: Unknown Member") {
+				HandleErrors(`guild.fetchMember`, err);
+			}
 		});
 };
 
-const fetchRoles = async (guild_id) => {
+client.fetchRole = async (guild, role_id) => {
+	return await guild.roles
+		.fetch(role_id, false, true)
+		.then((role) => {
+			return {
+				id: role.id,
+				name: role.name,
+				color: role.color,
+				hoist: role.hoist,
+				rawPosition: role.rawPosition,
+				managed: role.managed,
+				mentionable: role.mentionable,
+				deleted: role.deleted,
+			};
+		})
+		.catch((err) => HandleErrors("guild.fetchRole", err));
+};
+
+client.fetchRoles = async (guild_id) => {
 	const guild = await DiscordClient.guilds.fetch(guild_id);
-	return guild.roles.fetch("", true, true).then((roleManager) => {
+	return guild.roles.fetch("", false, true).then((roleManager) => {
 		let c = 10;
 		let roles = [];
 		roleManager.cache.forEach((role) => {
@@ -39,6 +97,11 @@ const fetchRoles = async (guild_id) => {
 		//console.log("Roles:");
 		//console.log(roles);
 	});
+};
+
+const HandleErrors = (src = "config/api/discord.js", err) => {
+	logger.warn(`[${src}]: ${err}`);
+	return null;
 };
 
 module.exports = client;
