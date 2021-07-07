@@ -152,11 +152,14 @@ connection.saveServer = (data_fiveM, data_discord) => {
 		.catch((err) => HandleErrors("saveServer", err));
 };
 
-connection.offlineEveryone = async (server) => {
+connection.offlineEveryone = async (ip) => {
+	const db_server = await connection.findServer(ip);
+	const server = db_server._id;
 	const now = Date.now();
 	const records = await activityModel
 		.find({ server, currentlyOnline: true })
 		.exec();
+	//console.log(`updating ${records.length} activity records for ${server}`);
 	records.forEach(async (record) => {
 		const mod = await activityModel.findOne({ _id: record._id }).exec();
 		const duration = now - mod.onlineAt;
@@ -185,7 +188,7 @@ const CreateActivityModel = async (server, player) => {
 		onlineAt,
 		currentlyOnline: true,
 	}).save();
-	logger.info(
+	logger.event(
 		`${newActivityModel.player.fiveM.name} (${player._id}) has come online`
 	);
 	return newActivityModel;
@@ -207,7 +210,7 @@ const UpdateActivityModel = async (server, sv_online) => {
 		//console.log(exists);
 		if (!exists) {
 			const player = await playerModel.findById(record.player).exec();
-			logger.info(`${player.fiveM.name} (${player._id}) has gone offline`);
+			logger.event(`${player.fiveM.name} (${player._id}) has gone offline`);
 			const mod = await activityModel.findOne({ _id: record._id }).exec();
 			const duration = now - mod.onlineAt;
 			const model = await activityModel

@@ -102,11 +102,14 @@ const getPlayers = (ip) => {
 			//OfflineEveryone(srv);
 		}
 		if (err.code === "ECONNRESET") {
-			logger.error("[FiveM] Error ECONNRESET, Server connection unsteady!");
+			logger.error(
+				"[FiveM] Error ECONNRESET, Server connection reset by server software"
+			);
+			database.offlineEveryone(ip);
 			return null;
 		}
 		if (err.code === "ECONNREFUSED") {
-			database.OfflineEveryone(srv._id);
+			database.offlineEveryone(ip);
 			logger.error("[FiveM] Error ECONNREFUSED. Server probably offline.");
 			return null;
 		}
