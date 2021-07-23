@@ -54,16 +54,17 @@ const fivem_get = async (req, res) => {
 	}
 	//console.log(fiveM_server.serverInfo);
 	syncServerInfo(server, fiveM_server.serverInfo);
-	res.send("done");
 	const players = await syncPlayerInfo(server, fiveM_server.playerInfo);
 	//const hl_jobs = hl_getJobs(fiveM_server.serverInfo.vars);
 	syncActivity(server._id, players);
+	res.send("done");
+
 	// Object.entries(hl_jobs).forEach(([key, value]) => {
 	// 	console.log(`${key} : ${value}`);
 	// });
 	//console.log(players);
 	// const players = await findPlayers(server._id, playerInfos); // tack on matching sv_ids from server ping
-	// findDiscords(players, server._id);
+	findDiscords(players, server._id);
 	// database.updateActivity(players, serverId);
 	//console.log(discords);
 };
@@ -128,6 +129,7 @@ const findDiscords = async (players, id_server) => {
 	//const dbPlayers = await database.getAllPlayers(id_server);
 	//const dcGuild = await database.guilds.fetch(guildID);
 	players.forEach(async (player) => {
+		player = player.playerModel;
 		const identifiers = Object.fromEntries(player.fiveM.identifiers);
 		const _dateUpdated = player.discord._dateUpdated || 0;
 		const now = Date.now();
