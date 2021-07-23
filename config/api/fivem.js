@@ -82,7 +82,7 @@ class Server {
 					let info = {
 						resources: body.data.resources,
 						enhancedHostSupport: body.data.enhancedHostSupport,
-						icon: body.data.icon,
+						//icon: body.data.icon,
 						server: body.data.server,
 						vars,
 					};

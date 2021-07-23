@@ -7,7 +7,8 @@ const logger = require("emberdyn-logger");
 client.login(token);
 client.on("ready", async () => {
 	logger.access(`[DISCORD]: Logged in as ${client.user.tag}!`);
-	//const guild = await client.guilds.fetch(guildID);
+	//const Guilds = client.guilds.cache.map((guild) => guild);
+	//console.log(Guilds);
 	//const test = await client.fetchMember(guild, "252894159713730560");
 	//const role = await client.fetchRole(guild, "534477447069171727");
 	//console.log(test);

@@ -249,19 +249,19 @@ const compareObjects = (o1, o2) => {
 	return true;
 };
 
-async function CreateActivityModel(server, player) {
-	const onlineAt = Date.now();
-	const newActivityModel = await new activityModel({
-		server,
-		player,
-		onlineAt,
-		currentlyOnline: true,
-	}).save();
-	logger.info(
-		`${newActivityModel.player.name} (${player._id}) has come online`
-	);
-	return newActivityModel;
-}
+// async function CreateActivityModel(server, player) {
+// 	const onlineAt = Date.now();
+// 	const newActivityModel = await new activityModel({
+// 		server,
+// 		player,
+// 		onlineAt,
+// 		currentlyOnline: true,
+// 	}).save();
+// 	logger.info(
+// 		`${newActivityModel.player.name} (${player._id}) has come online`
+// 	);
+// 	return newActivityModel;
+// }
 
 async function UpdateActivityModel(server, sv_online) {
 	const now = Date.now();

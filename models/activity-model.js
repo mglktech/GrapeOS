@@ -13,13 +13,12 @@ const mySchema = new Schema(
 			type: Schema.ObjectId,
 			ref: "Player",
 		},
-		sessionId: Number,
 		onlineAt: Number,
 		offlineAt: Number,
 		currentlyOnline: Boolean,
-		duration: Number,
+		sv_id: Number,
 	},
-	{ timestamps: true }
+	{ timestamps: false }
 );
 
 // create model based on schema

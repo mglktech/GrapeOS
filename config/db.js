@@ -22,6 +22,7 @@ const connection = mongoose
 	.catch((err) => {
 		logger.database(`Database Error: ${err}`);
 	});
+
 connection.findPlayer = async (playerInfo) => {
 	// find player that matches one of the identifiers
 	const steamID = Object.fromEntries(playerInfo.identifiers).steam;
@@ -54,23 +55,6 @@ connection.findPlayer = async (playerInfo) => {
 			});
 	}
 	return model;
-};
-
-connection.updateActivity = async (players, server) => {
-	db_online = await activityModel
-		.find({ server, currentlyOnline: true })
-		.exec();
-	for await (const player of players) {
-		const exists = await db_online.some((record) => {
-			//console.log(`> ${record.player} ::: ${id} <`);
-			return record.player.toString() === player._id.toString();
-		});
-
-		if (!exists) {
-			await CreateActivityModel(server, player);
-		}
-	}
-	UpdateActivityModel(server, players);
 };
 
 connection.updatePlayerDiscord = async (player_id, discord_data) => {
@@ -152,6 +136,15 @@ connection.saveServer = (data_fiveM, data_discord) => {
 		.catch((err) => HandleErrors("saveServer", err));
 };
 
+connection.syncServer = async (serverId, serverInfo) => {
+	serverModel
+		.findByIdAndUpdate(serverId, serverInfo)
+		.then((data) => {
+			logger.database(`${data.fiveM.ips[0]} has been synced.`);
+		})
+		.catch((err) => HandleErrors("db_syncServer", err));
+};
+
 connection.offlineEveryone = async (ip) => {
 	const db_server = await connection.findServer(ip);
 	const server = db_server._id;
@@ -180,18 +173,56 @@ connection.offlineEveryone = async (ip) => {
 connection.getPlayer = (id) => {
 	return playerModel.findById(id);
 };
-const CreateActivityModel = async (server, player) => {
+
+connection.updateActivities = async (players, server) => {
+	for await (const player of players) {
+		const exists = await db_online.some((record) => {
+			//console.log(`> ${record.player} ::: ${id} <`);
+			return record.player.toString() === player._id.toString();
+		});
+
+		if (!exists) {
+		}
+	}
+};
+
+connection.getActivities = async (query) => {
+	return await activityModel.find(query).exec();
+};
+
+connection.CreateActivity = async (server, player) => {
 	const onlineAt = Date.now();
 	const newActivityModel = await new activityModel({
 		server,
-		player,
+		player: player.playerModel,
 		onlineAt,
 		currentlyOnline: true,
+		sv_id: player.sv_id,
 	}).save();
+	// logger.event(
+	// 	`${newActivityModel.player.fiveM.name} (${player._id}) has come online`
+	// );
 	logger.event(
-		`${newActivityModel.player.fiveM.name} (${player._id}) has come online`
+		`${newActivityModel.player.fiveM.name} (${newActivityModel.player._id}) has come online`
 	);
 	return newActivityModel;
+};
+
+connection.FinishActivity = async (id) => {
+	const now = Date.now();
+	const activity = await activityModel
+		.findByIdAndUpdate(id, {
+			currentlyOnline: false,
+			offlineAt: now,
+		})
+		.populate("player")
+		.exec()
+		.catch((err) => {
+			HandleErrors("FinishActivity", err);
+		});
+	logger.event(
+		`${activity.player.fiveM.name} (${activity.player._id}) has gone offline`
+	);
 };
 
 const UpdateActivityModel = async (server, sv_online) => {
