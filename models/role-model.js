@@ -16,7 +16,7 @@ const mySchema = new Schema(
 			type: Schema.Types.ObjectId,
 			ref: "Server",
 		},
-		id: Number,
+		role_id: String,
 		name: String,
 		color: Number,
 		hoist: Boolean,

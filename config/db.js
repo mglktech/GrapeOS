@@ -5,6 +5,7 @@ const logger = require("emberdyn-logger");
 const serverModel = require("../models/server-model");
 const playerModel = require("../models/player-model");
 const activityModel = require("../models/activity-model");
+const rolesModel = require("../models/role-model");
 
 const discord = require("./api/discord");
 
@@ -66,6 +67,31 @@ connection.updatePlayerDiscord = async (player_id, discord_data) => {
 			);
 			return response;
 		});
+};
+connection.discoverRoles = async (server, roles) => {
+	//console.log(`Processing ${roles.length} roles...`);
+	for await (let role of roles) {
+		const roleData = await rolesModel.findOne({ server, role_id: role }).exec();
+		//console.log(roleData);
+		if (!roleData) {
+			const newRole = new rolesModel({
+				server,
+				role_id: role,
+			});
+			newRole.save();
+			//console.log("new role discovered?");
+		}
+	}
+};
+
+connection.updateRole = (id, roleData) => {
+	return rolesModel.findByIdAndUpdate(id, roleData).then((role) => {
+		return role;
+	});
+};
+
+connection.getRoles = (server_id) => {
+	return rolesModel.find({ server: server_id, name: undefined }).exec();
 };
 
 connection.getAllPlayers = async (server_id) => {

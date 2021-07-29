@@ -65,6 +65,7 @@ const fivem_get = async (req, res) => {
 	//console.log(players);
 	// const players = await findPlayers(server._id, playerInfos); // tack on matching sv_ids from server ping
 	findDiscords(players, server._id);
+	syncDiscordRoles(server);
 	// database.updateActivity(players, serverId);
 	//console.log(discords);
 };
@@ -145,12 +146,25 @@ const findDiscords = async (players, id_server) => {
 				);
 				if (dInfo) {
 					database.updatePlayerDiscord(player._id, dInfo);
+					database.discoverRoles(id_server, dInfo.roles);
 				}
 			}
 
 			//console.log(dInfo);
 		}
 	});
+};
+
+const syncDiscordRoles = async (server) => {
+	const roles = await database.getRoles(server);
+	//console.log(`Processing ${roles.length} new roles...`);
+	for await (role of roles) {
+		//console.log(`fetchRole(${server.discord.id}, ${role.role_id})`);
+		let discordData = await discord.fetchRole(server.discord.id, role.role_id);
+		//console.log(`updateRole(${role._id}, ${discordData})`);
+		let updatedRole = await database.updateRole(role._id, discordData);
+		console.log(`New Role Discovered: ${discordData.name}`);
+	}
 };
 
 const createPlayer = (serverId, playerInfo) => {

@@ -65,12 +65,15 @@ client.fetchMember = async (guildID, playerID) => {
 		});
 };
 
-client.fetchRole = async (guild, role_id) => {
+client.fetchRole = async (guildID, role_id) => {
+	const guild = await client.guilds.fetch(guildID);
+	//console.log(guild);
+	//console.log(`Finding role with id: ${role_id}`);
 	return await guild.roles
 		.fetch(role_id, false, true)
 		.then((role) => {
 			return {
-				id: role.id,
+				//id: role.id,
 				name: role.name,
 				color: role.color,
 				hoist: role.hoist,
