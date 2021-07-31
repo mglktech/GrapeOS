@@ -41,7 +41,7 @@ connection.getOnline = async (dc_vUrlCode) => {
 				},
 			},
 		})
-		.sort({ sv_id: "asc" })
+		.sort({ sv_id: "desc" })
 		.exec();
 	return data;
 };
