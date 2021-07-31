@@ -99,10 +99,14 @@
             }
             return `<span class="badge m-1" style="background-color: ${hex};">${text}</span>`;
         }
-        function makeBadges(roles) {
+        function makeBadges(roles,deep=true) {
             let data = ``;
             for(let role of roles) {
-                if(role.hoist || role.managed || role.mentionable) {
+                if(!deep && (role.hoist || role.managed || role.mentionable)) {
+                    data += badge(role.name,role.color,true);
+                }
+                if(deep)
+                {
                     data += badge(role.name,role.color,true);
                 }
                 
