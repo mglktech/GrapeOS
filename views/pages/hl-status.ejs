@@ -9,8 +9,13 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Code:400,500,700">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,500,700">
     <style>
+        html {
+            height:100%;
+        }
         body {
+            height:100%;
             background-color: #212529;
+            
         }
         .span-sub {
             font-size: 15px;
@@ -30,15 +35,21 @@
             font-size: 12px;
             padding:.25rem;
             margin:.25rem;
+            white-space: nowrap
         }
         .headroom {
             height:35px;
             background:transparent;
         }
         .wrapper {
-            height: 200px;
             
         }
+        table {
+            display:block;
+            
+            overflow:auto;
+        }
+        
         ::-webkit-scrollbar {
             top:35px;
 	        width: 1rem;
@@ -118,10 +129,14 @@
             if(data.player.discord.nickname === null) {
                 data.player.discord.nickname = data.player.discord.user.username;
             }
+            let src = "/svg/Discord-Logo-White.svg";
+            if(data.player.discord.user.avatar) {
+                src = `https://cdn.discordapp.com/avatars/${data.player.discord.user.id}/${data.player.discord.user.avatar}.png?size=128`
+            }
             let html = `<tr>
                     <td class="text-center">${data.sv_id}</td>
                     <td>
-                        <div class="d-inline-flex"><img class="rounded-circle m-1" src="https://cdn.discordapp.com/avatars/${data.player.discord.user.id}/${data.player.discord.user.avatar}.png?size=128" width="50px">
+                        <div class="d-inline-flex"><img class="rounded-circle m-1" src="${src}" width="50px">
                             <div><span class="text-nowrap">${data.player.discord.nickname}</span><br><span
                                     class="text-nowrap span-sub">${data.player.fiveM.name}</span></div>
                         </div>
