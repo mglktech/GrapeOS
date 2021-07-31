@@ -1,16 +1,17 @@
 const express = require("express");
 const router = express.Router();
 //const FiveM = require("../controllers/api/fivem.js"); // "../controllers/api/fivem"
-const Db = require("../controllers/api/db.js");
+const api = require("../controllers/api.js");
 
 //API ROOT ROUTES
 //router.get("/", FiveM.index_get);
-router.get("/addServer/:ip/:discordID", Db.addServer); //
-router.get("/pingServer/:id", Db.fivem_get);
+router.get("/addServer/:ip/:discordID", api.addServer); //
+router.get("/pingServer/:id", api.fivem_get);
+router.get("/playerInfo/:vanityUrlCode", api.db_onlinePlayers_get);
 // FIVEM ROUTES
 
 // WINBOX ROUTES
-router.get("/winbox/hl", (req, res) => {
+router.get("/winbox/hlServerStatus", (req, res) => {
 	res.render("pages/hl-status");
 });
 router.get("/winbox/btns", (req, res) => {

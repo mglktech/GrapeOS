@@ -56,9 +56,9 @@ let optsHLStatus = {
 hlStatus.addEventListener("click", () => {
 	const box = winBox({
 		title: "HighLife Roleplay Server Status",
-		width: "400px",
-		height: "400px",
-		url: "/api/winbox/hl",
+		width: "800px",
+		height: "600px",
+		url: "/api/winbox/hlServerStatus",
 	});
 });
 test.addEventListener("click", () => {
@@ -118,7 +118,7 @@ const winBox = (opts) => {
 		},
 	};
 	let allOpts = Object.assign({}, opts, defaultOpts);
-	console.log(allOpts);
+	//console.log(allOpts);
 	return new WinBox(allOpts);
 };
 

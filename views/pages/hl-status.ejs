@@ -8,68 +8,132 @@
     <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Code:400,500,700">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,500,700">
-    <link rel="stylesheet" href="/css/file_style.css">
+    <style>
+        .span-sub {
+            font-size: 15px;
+            line-height: 18px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .role-circle {
+            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            padding: 0;
+            margin-left: .25rem;
+        }
+        .role {
+            border: 1px solid;
+            border-radius: 50rem;
+            font-size: 12px;
+            padding:.25rem;
+            margin:.25rem;
+        }
+        
+
+
+
+
+
+
+    </style>
+    <script src="/dist/timeago.min.js"></script>
 </head>
 
 <body>
-    <div class="file_page">
-        <h2>Stub for HighLife Status</h2>
-
-        <table>
+    <div id="wrapper">
+        <table class="table table-striped table-dark table-sm table-bordered">
             <thead>
                 <tr>
-                    <th>Name</th>
                     <th>ID</th>
-                    <th>Info</th>
+                    <th>Name</th>
+                    <th>Tags</th>
+                    <th>Joined</th>
                 </tr>
             </thead>
-            <tbody id="myTable">
+            <tbody id="tableBody">
             </tbody>
         </table>
 
-        <script>
-            const UpdateOnce = () => {
-                const textPlayerCount = document.getElementById("playerCount");
-                const stat = fetch("/api/fivem").then((data) => {
-                    data.json().then((res) => {
-                        buildTable(res);
-                        //Update();
-                    })
-                });
+    </div>
+    
+    <script defer>
+        
+        const badge = (text,color,rounded = true)   => {
+            let hex = `#${parseInt(color).toString(16)}`;
+            if(hex === "#0") {
+                hex = "#000000";
             }
-            const Update = () => {
-                const textPlayerCount = document.getElementById("playerCount");
-                setInterval(() => {
-                    const stat = fetch("/api/fivem").then((data) => {
-                        data.json().then(res => buildTable(res))
-                    });
-                }, 5000)
+            //console.log(hex);
+            if(rounded)
+            {
+                return `<div class="d-inline-flex align-items-center role" style="border-color: ${hex}">
+    <div class="role-circle" style="background: ${hex}"></div><span class="mx-1">${text}</span>
+</div>`;
             }
-            const buildTable = (data) => {
-                const table = document.getElementById("myTable");
-                table.innerHTML = "";
-                data.forEach((row) => {
-                    //console.log(`ID: ${row.id} STEAM: ${row.identifiers[0]}`);
-                    var discordID = row.identifiers.find((id) => {
-                        var DiscordID = id.startsWith("discord");
-                        return DiscordID;
-                    });
-                    var SteamID = row.identifiers.find((id) => {
-                        var SteamID = id.startsWith("steam");
-                        return SteamID;
-                    });
-                    var row = `<tr>
-                    <td>${row.name}</td>
-                    <td>${row.id}</td>
-                    <td><a class="tbl-info"><img src='/assets/img/bi_arrow-up-right-square-fill.svg'></a></td>
-                    </tr>`;
-                    // <td>${SteamID || " "}</td>
-                    // <td>${discordID || " "}</td>
-                    table.innerHTML += row;
-                })
+            return `<span class="badge m-1" style="background-color: ${hex};">${text}</span>`;
+        }
+        function makeBadges(roles) {
+            let data = ``;
+            for(let role of roles) {
+                data += badge(role.name,role.color,true);
             }
-            UpdateOnce();
-        </script>
+            return data;
+        }
+        const row = (data) => {
+            
+            if(data.player.discord.nickname === null) {
+                data.player.discord.nickname = data.player.discord.user.username;
+            }
+            let html = `<tr>
+                    <td class="text-center">${data.sv_id}</td>
+                    <td>
+                        <div class="d-inline-flex"><img class="rounded-circle m-1" src="https://cdn.discordapp.com/avatars/${data.player.discord.user.id}/${data.player.discord.user.avatar}.png?size=128" width="50px">
+                            <div><span class="text-nowrap">${data.player.discord.nickname}</span><br><span
+                                    class="text-nowrap span-sub">${data.player.fiveM.name}</span></div>
+                        </div>
+                    </td>
+                    <td>${makeBadges(data.player.discord.roles)}</td>
+                    <td>
+                        <span class="text-nowrap">${timeago.format(data.onlineAt)}</span> 
+                        </td>
+                </tr>`;
+            return html;
+        }
+        const noDiscord_row = (data) => {
+            let html = `<tr>
+                    <td class="text-center">${data.sv_id}</td>
+                    <td>
+                        <span class="text-nowrap span-sub">${data.player.fiveM.name}</span>
+                    </td>
+                    <td></td>
+                    <td><span class="text-nowrap">${timeago.format(data.onlineAt)}</span></td>
+                </tr>`;
+            return html;
+        }
+        
+
+        async function parseData() {
+            const response = await fetch("/api/playerInfo/highlife");
+            const pData = await response.json();
+            const wrapper = document.getElementById("tableBody");
+            wrapper.innerHTML = "";
+            console.log(pData);
+            for(let p of pData) {
+                if(p.player.discord._dateUpdated === undefined) {
+                    wrapper.innerHTML += noDiscord_row(p);
+                    
+                }
+                else {
+                    wrapper.innerHTML += row(p);
+                }
+                
+            }
+            
+        }
+        parseData();
+        window.setInterval("parseData()", 10000);
+    </script>
+    
 </body>
 
 </html>

@@ -19,7 +19,7 @@ const mySchema = new Schema({
 			avatar: String,
 		},
 		nickname: String,
-		roles: [String],
+		roles: [{ type: Schema.Types.ObjectId, ref: "Role" }],
 		deleted: Boolean,
 		joined: Number,
 		_dateUpdated: Number,

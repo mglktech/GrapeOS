@@ -24,6 +24,23 @@ const connection = mongoose
 		logger.database(`Database Error: ${err}`);
 	});
 
+connection.getOnline = async (dc_vUrlCode) => {
+	// Find server by Discord Vanity Url Code
+	const server = await serverModel
+		.find({ "discord.vanityUrlCode": dc_vUrlCode })
+		.exec();
+	//console.log(server);
+	const data = await activityModel
+		.find({ server, currentlyOnline: true })
+		.populate({
+			path: "player",
+			populate: { path: "discord.roles" },
+		})
+		.sort({ sv_id: "asc" })
+		.exec();
+	return data;
+};
+
 connection.findPlayer = async (playerInfo) => {
 	// find player that matches one of the identifiers
 	const steamID = Object.fromEntries(playerInfo.identifiers).steam;
@@ -84,13 +101,17 @@ connection.discoverRoles = async (server, roles) => {
 	}
 };
 
+connection.getRoleByDiscordId = (server, discord_id) => {
+	return rolesModel.findOne({ server, role_id: discord_id });
+};
+
 connection.updateRole = (id, roleData) => {
 	return rolesModel.findByIdAndUpdate(id, roleData).then((role) => {
 		return role;
 	});
 };
 
-connection.getRoles = (server_id) => {
+connection.getEmptyRoles = (server_id) => {
 	return rolesModel.find({ server: server_id, name: undefined }).exec();
 };
 

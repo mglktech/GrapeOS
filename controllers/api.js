@@ -1,6 +1,6 @@
-const fiveM = require("../../config/api/fivem");
-const discord = require("../../config/api/discord");
-const database = require("../../config/db");
+const fiveM = require("../config/api/fivem");
+const discord = require("../config/api/discord");
+const database = require("../config/db");
 const logger = require("emberdyn-logger");
 require("dotenv").config();
 /*
@@ -8,6 +8,12 @@ Provisions:
 - Server IP Address
 - Discord Server ID
 */
+
+const db_onlinePlayers_get = async (req, res) => {
+	const dc_vUrl = req.params.vanityUrlCode;
+	const serverInfo = await database.getOnline(dc_vUrl);
+	res.json(serverInfo);
+};
 
 const fiveM_getServerPlayerInfo = async (ips) => {
 	// Iterates through server.fiveM.ips and returns players from first working IP address;
@@ -145,8 +151,14 @@ const findDiscords = async (players, id_server) => {
 					identifiers.discord
 				);
 				if (dInfo) {
+					await database.discoverRoles(id_server, dInfo.roles);
+					let newRoles = [];
+					for await (let roleId of dInfo.roles) {
+						const role = await database.getRoleByDiscordId(id_server, roleId);
+						newRoles.push(role._id);
+					}
+					dInfo.roles = newRoles;
 					database.updatePlayerDiscord(player._id, dInfo);
-					database.discoverRoles(id_server, dInfo.roles);
 				}
 			}
 
@@ -156,7 +168,7 @@ const findDiscords = async (players, id_server) => {
 };
 
 const syncDiscordRoles = async (server) => {
-	const roles = await database.getRoles(server);
+	const roles = await database.getEmptyRoles(server);
 	//console.log(`Processing ${roles.length} new roles...`);
 	for await (role of roles) {
 		//console.log(`fetchRole(${server.discord.id}, ${role.role_id})`);
@@ -253,4 +265,4 @@ const MapIdentifiers = (identifiers) => {
 	return new Map(map);
 };
 
-module.exports = { addServer, fivem_get };
+module.exports = { addServer, fivem_get, db_onlinePlayers_get };
