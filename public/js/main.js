@@ -56,8 +56,9 @@ let optsHLStatus = {
 hlStatus.addEventListener("click", () => {
 	const box = winBox({
 		title: "HighLife Roleplay Server Status",
-		width: "800px",
-		height: "600px",
+		width: "300px",
+		height: "200px",
+		max: true,
 		url: "/api/winbox/hlServerStatus",
 	});
 });
