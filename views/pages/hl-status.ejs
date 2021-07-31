@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Code:400,500,700">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,500,700">
     <style>
+        body {
+            background-color: #212529;
+        }
         .span-sub {
             font-size: 15px;
             line-height: 18px;
@@ -28,7 +31,30 @@
             padding:.25rem;
             margin:.25rem;
         }
-        
+        .headroom {
+            height:35px;
+            background:transparent;
+        }
+        .wrapper {
+            height: 200px;
+            
+        }
+        ::-webkit-scrollbar {
+            top:35px;
+	        width: 1rem;
+            background-color:#212529;
+        }
+        :-webkit-scrollbar-track {
+	        background-color: #212529;
+        }
+        ::-webkit-scrollbar-thumb {
+	        border-radius: 10px;
+	        background-color: rgba(38, 21, 67, 1);
+        }
+
+        ::-webkit-scrollbar-corner {
+            background: transparent;
+        }
 
 
 
@@ -40,8 +66,9 @@
 </head>
 
 <body>
+    <div class="headroom"></div>
     <div id="wrapper">
-        <table class="table table-striped table-dark table-sm table-bordered">
+        <table class="table table-striped table-dark table-sm table-bordered table-hover">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -75,7 +102,10 @@
         function makeBadges(roles) {
             let data = ``;
             for(let role of roles) {
-                data += badge(role.name,role.color,true);
+                if(role.hoist || role.managed || role.mentionable) {
+                    data += badge(role.name,role.color,true);
+                }
+                
             }
             return data;
         }
@@ -116,18 +146,19 @@
             const response = await fetch("/api/playerInfo/highlife");
             const pData = await response.json();
             const wrapper = document.getElementById("tableBody");
-            wrapper.innerHTML = "";
-            console.log(pData);
+            let inner = "";
+            //console.log(pData);
             for(let p of pData) {
                 if(p.player.discord._dateUpdated === undefined) {
-                    wrapper.innerHTML += noDiscord_row(p);
+                    inner += noDiscord_row(p);
                     
                 }
                 else {
-                    wrapper.innerHTML += row(p);
+                    inner += row(p);
                 }
                 
             }
+            wrapper.innerHTML = inner;
             
         }
         parseData();

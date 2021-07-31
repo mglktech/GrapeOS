@@ -34,7 +34,12 @@ connection.getOnline = async (dc_vUrlCode) => {
 		.find({ server, currentlyOnline: true })
 		.populate({
 			path: "player",
-			populate: { path: "discord.roles" },
+			populate: {
+				path: "discord.roles",
+				options: {
+					sort: { rawPosition: "desc" },
+				},
+			},
 		})
 		.sort({ sv_id: "asc" })
 		.exec();
