@@ -7,7 +7,7 @@ const md = require("markdown-it")({
 }).use(require("markdown-it-checkbox"));
 
 const test = async (req, res) => {
-	var path = __dirname + "../../test_.md";
+	var path = __dirname + "../test_.md";
 	let file = fs.readFileSync(path);
 	//console.log(file.toString());
 	let content = md.render(file.toString());
