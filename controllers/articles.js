@@ -1,5 +1,6 @@
 const Article = require("../models/article-model");
 const fs = require("fs");
+
 const md = require("markdown-it")({
 	html: true,
 	linkify: true,
@@ -7,8 +8,7 @@ const md = require("markdown-it")({
 }).use(require("markdown-it-checkbox"));
 
 const test = async (req, res) => {
-	var path = __dirname + "../test_.md";
-	let file = fs.readFileSync(path);
+	let file = fs.readFileSync("./test_.md");
 	//console.log(file.toString());
 	let content = md.render(file.toString());
 	//console.log(content);
