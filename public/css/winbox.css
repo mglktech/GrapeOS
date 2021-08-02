@@ -2,17 +2,20 @@
 	background: transparent;
 	border: 0px solid;
 	border-color: rgba(0, 0, 0, 0);
-	border-radius: 0.5rem;
-	overflow: hidden;
-	/*box-shadow: none;*/
+	/* border-radius: 0.5rem; */
+	overflow: show;
+	box-shadow: none;
 }
 .wb-body {
 	background: transparent;
-	top: 0px;
-	border: 0px solid;
+	border-radius: 0.5rem 0 0.5rem 0.5rem;
+	box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+	/* box-shadow: -5px 0px 10px 10px #000000; */
+	/* top: 0px; */
+	/* border: 0px solid;
 	border-color: rgba(0, 0, 0, 0);
 	border-radius: 0rem 0rem 0.5rem 0.5rem;
-	z-index: -1;
+	z-index: -1; */
 }
 
 .wb-title {
@@ -24,16 +27,20 @@
 }
 .wb-icon {
 	background-color: #212529;
+	border-radius: 0.5rem 0.5rem 0 0;
+	box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
 }
 
 .wb-min {
 	background-color: #212529;
+	border-radius: 0.5rem 0 0 0;
 }
 .wb-max {
 	background-color: #212529;
 }
 .wb-close {
 	background-color: #212529;
+	border-radius: 0 0.5rem 0 0;
 }
 .wb-icon span {
 	opacity: 0.65;

@@ -1,25 +1,17 @@
 const Article = require("../models/article-model");
 const fs = require("fs");
-const hljs = require("highlight.js");
 const md = require("markdown-it")({
 	html: true,
 	linkify: true,
 	typographer: true,
-	highlight: function (str, lang) {
-		if (lang && hljs.getLanguage(lang)) {
-			try {
-				return hljs.highlight(lang, str).value;
-			} catch (__) {}
-		}
-
-		return ""; // use external default escaping
-	},
 }).use(require("markdown-it-checkbox"));
 
-const test = (req, res) => {
+const test = async (req, res) => {
 	var path = __dirname + "../../test_.md";
 	let file = fs.readFileSync(path);
+	//console.log(file.toString());
 	let content = md.render(file.toString());
+	//console.log(content);
 	res.render("./pages/article.ejs", { article: content });
 };
 const new_get = (req, res) => {

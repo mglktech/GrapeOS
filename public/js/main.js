@@ -62,12 +62,12 @@ hlStatus.addEventListener("click", () => {
 		url: "/api/winbox/hlServerStatus",
 	});
 });
-test.addEventListener("click", () => {
+mdfile.addEventListener("click", () => {
 	const box = winBox({
-		title: "Buttons",
+		title: "mdfile",
 		width: "400px",
 		height: "400px",
-		url: "/api/winbox/btns",
+		url: "/articles/test",
 	});
 });
 

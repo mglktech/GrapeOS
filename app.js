@@ -10,7 +10,7 @@ const logger = require("emberdyn-logger");
 const topLevelRoutes = require("./routes/top-level-routes");
 const authRoutes = require("./routes/auth");
 const apiRoutes = require("./routes/api");
-//const articleRoutes = require("./routes/articles");
+const articleRoutes = require("./routes/articles");
 //const projectRoutes = require("./routes/projects");
 //const demoRoutes = require("./routes/demos");
 const { resolveInclude } = require("ejs");
@@ -58,7 +58,7 @@ app.use(async (req, res, next) => {
 app.use("/", topLevelRoutes);
 app.use("/auth", authRoutes);
 app.use("/api", apiRoutes);
-//app.use("/articles", articleRoutes);
+app.use("/articles", articleRoutes);
 //app.use("/projects", projectRoutes);
 //app.use("/demos", demoRoutes);
 
