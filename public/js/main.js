@@ -47,18 +47,11 @@ let optsLogin = {
 	},
 };
 
-let optsHLStatus = {
-	onblur: function () {
-		this.setBackground("#00765B");
-	},
-};
-
 hlStatus.addEventListener("click", () => {
 	const box = winBox({
 		title: "HighLife Roleplay Server Status",
-		width: "300px",
-		height: "200px",
-		max: true,
+		width: "400px",
+		height: "500px",
 		url: "/api/winbox/hlServerStatus",
 	});
 });
@@ -66,7 +59,7 @@ mdfile.addEventListener("click", () => {
 	const box = winBox({
 		title: "mdfile",
 		width: "400px",
-		height: "400px",
+		height: "500px",
 		url: "/articles/test",
 	});
 });
@@ -114,9 +107,14 @@ date.addEventListener("load", initClock());
 
 const winBox = (opts) => {
 	const defaultOpts = {
-		onblur: function () {
-			this.setBackground("#00765B");
+		max: function () {
+			if (window.screen.width < 400) {
+				return true;
+			} else {
+				return false;
+			}
 		},
+		onblur: function () {},
 	};
 	let allOpts = Object.assign({}, opts, defaultOpts);
 	//console.log(allOpts);
