@@ -14,10 +14,21 @@ router.get("/playerInfo/:vanityUrlCode", api.db_onlinePlayers_get);
 router.get("/winbox/hlServerStatus", (req, res) => {
 	res.render("pages/hl-status");
 });
+router.get("/filemanager/:route", (req, res) => {
+	const route = req.params.route;
+	res.render("pages/file-manager", { route });
+});
 router.get("/winbox/btns", (req, res) => {
 	res.render("pages/btns");
 });
+router.get("/spotify/info", async (req, res) => {
+	var data = "";
 
+	res.json(data);
+});
+router.get("/spotify/widget", async (req, res) => {
+	res.render("pages/spotify");
+});
 // DISCORD API ROUTES
 // router.get("/discord", discord.init);
 // router.get("/discord/:guildID/get", discord.guild_get);

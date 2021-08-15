@@ -2,9 +2,10 @@ const about = document.querySelector("#about");
 const login = document.querySelector("#login");
 const hlStatus = document.querySelector("#hl-status");
 const test = document.querySelector("#test");
-
+const fm = document.querySelector("#filemanager");
 const time = document.querySelector("#time");
 const date = document.querySelector("#date");
+const spotify = document.querySelector("#spotify");
 
 window.document.addEventListener("formHandler", handleForm, false);
 async function handleForm(e) {
@@ -46,6 +47,44 @@ let optsLogin = {
 		this.setBackground("#00765B");
 	},
 };
+
+spotify.addEventListener("click", () => {
+	if (window.screen.width < window.screen.height && window.screen.width < 450) {
+		const box = winBox({
+			title: "Spotify - Listen In",
+			width: "100%",
+			height: "200px",
+			x: "bottom",
+			bottom: 50,
+			y: "right",
+			url: "/api/spotify/widget",
+			//url:"/api/public/fm/home"
+		});
+	} else {
+		const box = winBox({
+			title: "Spotify - Listen In",
+			width: "450px",
+			height: "200px",
+			x: "bottom",
+			bottom: 50,
+			y: "right",
+			url: "/api/spotify/widget",
+			//url:"/api/public/fm/home"
+		});
+	}
+});
+
+fm.addEventListener("click", () => {
+	const box = winBox({
+		title: "Home",
+		width: "800px",
+		height: "600px",
+		x: "center",
+		y: "center",
+		url: "/api/filemanager/home",
+		//url:"/api/public/fm/home"
+	});
+});
 
 hlStatus.addEventListener("click", () => {
 	const box = winBox({
@@ -107,13 +146,12 @@ date.addEventListener("load", initClock());
 
 const winBox = (opts) => {
 	const defaultOpts = {
-		max: function () {
-			if (window.screen.width < 400) {
-				return true;
-			} else {
-				return false;
+		onfocus: function () {
+			if (window.screen.width < this.width) {
+				this.maximize(true);
 			}
 		},
+
 		onblur: function () {},
 	};
 	let allOpts = Object.assign({}, opts, defaultOpts);

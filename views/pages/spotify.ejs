@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Code:400,500,700">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,500,700">
+    
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    <title>Document</title>
+</head>
+<body>
+  <div class="row g-0 align-items-center bg-dark min-vh-100">
+    <div class="col-4 p-1"><img class="img-fluid" id="trackart"></div>
+    <div class="col p-1">
+        <div class="d-flex flex-column"><span class="text-secondary">Playing:</span><a id="tracktitle" class="text-white h3" href="" style="text-decoration: none;font-weight: bold;">Title</a>
+            <div><span class="text-secondary">By:&nbsp;</span><a id="trackartist" href="">Title</a></div>
+        </div>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script defer>
+    /**
+  Developed by Prashant Shrestha
+  + https://prashant.me
+*/
+
+var lastfmData = {
+  baseURL:
+    "https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=",
+  // Your Last.fm Username
+  user: "mglkdottech",
+  // Your API key
+  api_key: "f2ef563e9f5436998cf6a5139b902bf1",
+  additional: "&format=json&limit=1"
+};
+
+var getSetLastFM = function() {
+  $.ajax({
+    type: "GET",
+    url:
+      lastfmData.baseURL +
+      lastfmData.user +
+      "&api_key=" +
+      lastfmData.api_key +
+      lastfmData.additional,
+    dataType: "json",
+    success: function(resp) {
+      var recentTrack = resp.recenttracks.track[0];
+      var formatted =
+        "<img src='https://i.imgur.com/EgWjJry.png'>" + recentTrack.name;
+      $("a#tracktitle")
+        .html(formatted)
+        .attr("href", recentTrack.url)
+        .attr("title", recentTrack.name + " by " + recentTrack.artist["#text"])
+        .attr("target", "_blank");
+
+      var artistFormatted =
+        "<img src='https://i.imgur.com/fae5XZA.png'>" +
+        recentTrack.artist["#text"];
+      $("a#trackartist")
+        .html(artistFormatted)
+        .attr("title", "Artist : " + recentTrack.artist["#text"]);
+      $("img#trackart").attr("src", recentTrack.image[2]["#text"]);
+    },
+    error: function(resp) {
+      $("a#tracktitle").html(
+        "<img src='https://i.imgur.com/EgWjJry.png'>" + "Silence!"
+      );
+      $("img#trackart").attr("src", "https://i.imgur.com/Q6cCswP.jpg");
+      var artistFormatted =
+        "<img src='https://i.imgur.com/fae5XZA.png'>Prashant Shrestha";
+      $("a#trackartist")
+        .html(artistFormatted)
+        .attr("href", "www.prashant.me/");
+    }
+  });
+};
+
+// Get the new one.
+getSetLastFM();
+// Start the countdown.
+setInterval(getSetLastFM, 10 * 1000); </script>
+</body>
+<script defer>
+    
+</script>
+</html>

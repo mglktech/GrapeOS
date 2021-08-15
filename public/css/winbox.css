@@ -1,8 +1,8 @@
 .winbox {
-	background: transparent;
+	background: #212529;
 	border: 0px solid;
 	border-color: rgba(0, 0, 0, 0);
-	/* border-radius: 0.5rem; */
+	border-radius: 1rem;
 	overflow: show;
 	box-shadow: none;
 }
@@ -10,8 +10,10 @@
 	background: transparent;
 	border-radius: 0.5rem 0 0.5rem 0.5rem;
 	box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+	margin: 0.5rem;
+	align-items: center;
 	/* box-shadow: -5px 0px 10px 10px #000000; */
-	/* top: 0px; */
+	/* top: 5px; */
 	/* border: 0px solid;
 	border-color: rgba(0, 0, 0, 0);
 	border-radius: 0rem 0rem 0.5rem 0.5rem;
@@ -20,15 +22,15 @@
 
 .wb-title {
 	background: transparent;
-	font-size: 0px;
-	text-transform: uppercase;
-	font-weight: 600;
+	font-size: 14px;
+	/* text-transform: uppercase; */
+	font-weight: 200;
 	z-index: 1;
 }
 .wb-icon {
 	background-color: #212529;
 	border-radius: 0.5rem 0.5rem 0 0;
-	box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22);
+	/* box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22); */
 }
 
 .wb-min {

@@ -1,6 +1,6 @@
 body {
 	margin: 0;
-	font-family: "Roboto Mono", sans serif;
+	/* font-family: "Roboto Mono", sans serif; */
 	font-size: 1rem;
 	font-weight: 400;
 	line-height: 1.5;
@@ -8,6 +8,15 @@ body {
 	background: linear-gradient(90deg, rgba(38, 21, 67, 1), rgba(21, 94, 77, 1));
 	-webkit-text-size-adjust: 100%;
 	-webkit-tap-highlight-color: transparent;
+}
+
+a:hover {
+	color: var(--bs-purple);
+}
+
+a {
+	color: #6c757d;
+	text-decoration: none;
 }
 
 .desktop-center {
