@@ -1,4 +1,3 @@
-const about = document.querySelector("#about");
 const login = document.querySelector("#login");
 const hlStatus = document.querySelector("#hl-status");
 const test = document.querySelector("#test");
@@ -100,16 +99,6 @@ mdfile.addEventListener("click", () => {
 		width: "400px",
 		height: "500px",
 		url: "/articles/test",
-	});
-});
-
-about.addEventListener("click", () => {
-	const box = winBox({
-		title: "About Me",
-		width: "400px",
-		height: "400px",
-		x: "center",
-		url: "/about",
 	});
 });
 
