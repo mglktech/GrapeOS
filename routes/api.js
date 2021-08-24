@@ -10,6 +10,8 @@ router.get("/pingServer/:id", api.fivem_get);
 router.get("/playerInfo/:vanityUrlCode", api.db_onlinePlayers_get);
 // FIVEM ROUTES
 
+// LastFM Data
+router.get("/lastfm", api.getUserTracks);
 // WINBOX ROUTES
 router.get("/winbox/hlServerStatus", (req, res) => {
 	res.render("pages/hl-status");

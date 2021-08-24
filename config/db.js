@@ -6,6 +6,7 @@ const serverModel = require("../models/server-model");
 const playerModel = require("../models/player-model");
 const activityModel = require("../models/activity-model");
 const rolesModel = require("../models/role-model");
+const cronTaskModel = require("../models/crontask-model");
 
 const discord = require("./api/discord");
 
@@ -23,6 +24,65 @@ const connection = mongoose
 	.catch((err) => {
 		logger.database(`Database Error: ${err}`);
 	});
+
+connection.getCrons = async () => {
+	let crons = await cronTaskModel.find().exec();
+	let cronData = [];
+	//console.log(`CRONS:`);
+
+	for (let cron of crons) {
+		let dataObj = Object.fromEntries(cron.data);
+		let newCron = {
+			_id: cron._id,
+			name: cron.name,
+			exp: cron.exp,
+			cmd: cron.cmd,
+			data: dataObj,
+			enabled: cron.enabled,
+		};
+		cronData.push(newCron);
+		//console.log(newCron);
+	}
+	return cronData;
+};
+
+connection.getCron = async (_id) => {
+	let cron = await cronTaskModel.findById(_id).exec();
+	let dataObj = Object.fromEntries(cron.data);
+	let newCron = {
+		_id: cron._id,
+		name: cron.name,
+		exp: cron.exp,
+		cmd: cron.cmd,
+		data: dataObj,
+		enabled: cron.enabled,
+	};
+	return newCron;
+};
+
+connection.toggleCron = async (_id) => {
+	let cron = await cronTaskModel.findById(_id).exec();
+	let cronDataID = Object.fromEntries(cron.data).id || "";
+	if (cron) {
+		if (cron.enabled) {
+			connection.offlineEveryone(cronDataID);
+		}
+		cron.enabled = !cron.enabled;
+		cron.save();
+	}
+};
+connection.addCron = async (cron) => {
+	const newCronJob = new cronTaskModel(cron);
+	console.log("New CRON:");
+	console.log(newCronJob);
+	newCronJob.save();
+};
+
+connection.delCron = (_id) => {
+	cronTaskModel.findByIdAndRemove(_id).then((res) => {
+		console.log("CRON Removed: " + _id);
+	});
+};
 
 connection.getOnline = async (dc_vUrlCode) => {
 	// Find server by Discord Vanity Url Code
@@ -197,28 +257,13 @@ connection.syncServer = async (serverId, serverInfo) => {
 		.catch((err) => HandleErrors("db_syncServer", err));
 };
 
-connection.offlineEveryone = async (ip) => {
-	const db_server = await connection.findServer(ip);
-	const server = db_server._id;
-	const now = Date.now();
+connection.offlineEveryone = async (server) => {
 	const records = await activityModel
 		.find({ server, currentlyOnline: true })
 		.exec();
 	//console.log(`updating ${records.length} activity records for ${server}`);
-	records.forEach(async (record) => {
-		const mod = await activityModel.findOne({ _id: record._id }).exec();
-		const duration = now - mod.onlineAt;
-		activityModel
-			.findByIdAndUpdate(record._id, {
-				offlineAt: now,
-				duration,
-				currentlyOnline: false,
-			})
-			.exec();
-		const player = await connection.getPlayer(record.player);
-		logger.event(
-			`${player.fiveM.name} (${player._id}) has gone offline due to server not responding`
-		);
+	records.forEach((record) => {
+		connection.FinishActivity(record._id);
 	});
 };
 
@@ -260,21 +305,22 @@ connection.CreateActivity = async (server, player) => {
 	return newActivityModel;
 };
 
-connection.FinishActivity = async (id) => {
+connection.FinishActivity = (id) => {
 	const now = Date.now();
-	const activity = await activityModel
+	activityModel
 		.findByIdAndUpdate(id, {
 			currentlyOnline: false,
 			offlineAt: now,
 		})
-		.populate("player")
-		.exec()
+		.populate("player") // must populate otherwise it cannot grab player name/id
+		.then((activity) => {
+			logger.event(
+				`${activity.player.fiveM.name} (${activity.player._id}) has gone offline`
+			);
+		})
 		.catch((err) => {
 			HandleErrors("FinishActivity", err);
 		});
-	logger.event(
-		`${activity.player.fiveM.name} (${activity.player._id}) has gone offline`
-	);
 };
 
 const UpdateActivityModel = async (server, sv_online) => {

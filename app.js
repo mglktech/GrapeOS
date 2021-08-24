@@ -8,22 +8,27 @@ const MongoStore = require("connect-mongo");
 const passport = require("passport");
 const logger = require("emberdyn-logger");
 const topLevelRoutes = require("./routes/top-level-routes");
+const accountRoutes = require("./routes/account");
 const authRoutes = require("./routes/auth");
 const apiRoutes = require("./routes/api");
 const articleRoutes = require("./routes/articles");
+const publicRoutes = require("./routes/public");
+const protectedRoutes = require("./routes/protected");
 //const projectRoutes = require("./routes/projects");
 //const demoRoutes = require("./routes/demos");
 const { resolveInclude } = require("ejs");
 
 require("dotenv").config();
 require("./config/db");
-
+require("./config/strategies/localStrategy");
+require("./config/api/discord.js");
+require("./config/cron.js");
 let app = express();
 
 let string = "";
 // DEFAULT CONFIGS
 app.use(express.static(path.join(__dirname, "public"))); // PUBLIC STATIC DIRECTORY
-app.use(express.urlencoded({ extended: true })); // EXTENDED URLENCODING FOR FORMS
+
 app.set("views", path.join(__dirname, "views")); // set views directory
 app.set("view engine", "ejs"); // set view engine
 app.use(morgan); // VERBOSE CONSOLE LOGGING
@@ -44,11 +49,10 @@ app.use(
 	})
 );
 
-require("./config/strategies/localStrategy");
 app.use(passport.initialize());
 app.use(passport.session());
-
-app.use(async (req, res, next) => {
+app.use(express.urlencoded({ extended: true })); // EXTENDED URLENCODING FOR FORMS
+app.use((req, res, next) => {
 	// DEBUGGING
 	//console.log(req.session);
 	next();
@@ -56,9 +60,12 @@ app.use(async (req, res, next) => {
 
 // Index Routing
 app.use("/", topLevelRoutes);
+app.use("/public", publicRoutes);
+app.use("/account", accountRoutes);
 app.use("/auth", authRoutes);
 app.use("/api", apiRoutes);
 app.use("/articles", articleRoutes);
+app.use("/protected", protectedRoutes);
 //app.use("/projects", projectRoutes);
 //app.use("/demos", demoRoutes);
 
@@ -69,5 +76,3 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => logger.system(`Listening on ${PORT}`));
-
-require("./config/api/discord.js");

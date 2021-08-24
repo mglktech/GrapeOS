@@ -2,12 +2,22 @@ const fiveM = require("../config/api/fivem");
 const discord = require("../config/api/discord");
 const database = require("../config/db");
 const logger = require("emberdyn-logger");
+const lastfmclient = require("lastfm-node-client");
 require("dotenv").config();
-/*
+/* 
 Provisions:
 - Server IP Address
 - Discord Server ID
 */
+const getUserTracks = async (req, res) => {
+	const lastfm = new lastfmclient(process.env.lastfm_api_key);
+	let userRecentTracks = await lastfm.userGetRecentTracks({
+		user: process.env.lastfm_user,
+		limit: 1,
+	});
+	let recentTrack = userRecentTracks.recenttracks.track[0];
+	res.json(recentTrack);
+};
 
 const db_onlinePlayers_get = async (req, res) => {
 	const dc_vUrl = req.params.vanityUrlCode;
@@ -44,7 +54,27 @@ const getServerInfo = async (ip) => {
 	// let vars = new Map(Object.entries(data.vars));
 	// data.vars = vars;
 };
+const fivem_cron_get = async (serverId) => {
+	const server = await database.getServer(serverId);
+	if (!server) {
+		logger.warn("Error: No such server");
+		return;
+	}
 
+	const fiveM_server = await fiveM_getServerPlayerInfo(server.fiveM.ips);
+	if (!fiveM_server.serverInfo) {
+		logger.warn("Server Offline");
+		return;
+	}
+	//console.log(fiveM_server.serverInfo);
+	syncServerInfo(server, fiveM_server.serverInfo);
+	const players = await syncPlayerInfo(server, fiveM_server.playerInfo);
+	//const hl_jobs = hl_getJobs(fiveM_server.serverInfo.vars);
+	await syncActivity(server._id, players);
+	await findDiscords(players, server._id);
+	await syncDiscordRoles(server);
+	return;
+};
 const fivem_get = async (req, res) => {
 	const serverId = req.params.id;
 	const server = await database.getServer(serverId);
@@ -88,6 +118,20 @@ async function syncActivity(server, players) {
 			// console.log(
 			// 	`${record.player.toString()} ::: ${player.playerModel._id.toString()}`
 			// );
+			if (record.player.toString() === player.playerModel._id.toString()) {
+				//console.log(player);
+
+				if (record.sv_id !== player.sv_id) {
+					database.FinishActivity(record._id);
+					logger.info(
+						`[warning] sv_id mismatch on ${player.playerModel.fiveM.name} 
+${record.sv_id} ::: ${player.sv_id} 
+This may be because the client has re-connected to the server.`
+					);
+				}
+
+				return true;
+			}
 			return record.player.toString() === player.playerModel._id.toString();
 		});
 		if (!match) {
@@ -191,19 +235,17 @@ const getPlayers = (ip) => {
 			logger.error(
 				"[FiveM] Error ECONNABORTED, Server software caused connection abort"
 			);
-			//database.offlineEveryone(ip);
+
 			return null;
-			//OfflineEveryone(srv);
 		}
 		if (err.code === "ECONNRESET") {
 			logger.error(
 				"[FiveM] Error ECONNRESET, Server connection reset by server software"
 			);
-			//database.offlineEveryone(ip);
+
 			return null;
 		}
 		if (err.code === "ECONNREFUSED") {
-			//database.offlineEveryone(ip);
 			logger.error("[FiveM] Error ECONNREFUSED. Server probably offline.");
 			return null;
 		}
@@ -265,4 +307,10 @@ const MapIdentifiers = (identifiers) => {
 	return new Map(map);
 };
 
-module.exports = { addServer, fivem_get, db_onlinePlayers_get };
+module.exports = {
+	addServer,
+	fivem_get,
+	db_onlinePlayers_get,
+	fivem_cron_get,
+	getUserTracks,
+};
