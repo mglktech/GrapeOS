@@ -72,7 +72,7 @@ app.use("/protected", protectedRoutes);
 app.use((req, res) => {
 	// must manually set 404 status code
 	//res.status(404).sendFile(`${path}404.html`, { root });
-	res.render("./pages/404");
+	res.render("./pages/404", { referer: req.headers.referer });
 });
 
 app.listen(PORT, () => logger.system(`Listening on ${PORT}`));

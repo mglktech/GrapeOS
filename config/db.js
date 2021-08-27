@@ -209,7 +209,15 @@ connection.savePlayer = (data_fiveM, data_discord = null) => {
 connection.getServer = (id) => {
 	return serverModel
 		.findById(id)
+		.exec()
 		.catch((err) => HandleErrors("getServer(Database)", err));
+};
+connection.getServerByVUrl = (vUrl) => {
+	let sv_data = serverModel
+		.findOne({ "discord.vanityUrlCode": vUrl })
+		.exec()
+		.catch((err) => HandleErrors("getServer(Database)", err));
+	return sv_data;
 };
 
 connection.findServer = async (ip, discordID = null) => {

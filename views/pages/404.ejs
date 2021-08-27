@@ -1,15 +1,23 @@
 <!DOCTYPE html>
 <html>
-<%-include ("../partials/head.ejs") %>
+    <head>
+        <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>GrapeOS</title>
+    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Code:400,500,700">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,500,700">
+    <link rel="stylesheet" href="/assets/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/assets/css/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/styles.css">
+    </head>
+    
 
-<body>
-    <%-include ("../partials/nav.ejs");%>
-    <main class="page">
-    <!-- Page Body -->
-    <section>
+<body style="background:black;">
+    
         <div class="container text-center p-5">
             <div class="row">
-                <div class="col"><i class="fas fa-ban" style="font-size: 10vw;"></i></div>
+                <div class="col"><i class="fa fa-ban" style="font-size: 10vw;"></i></div>
             </div>
             <div class="row">
                 <div class="col">
@@ -23,13 +31,11 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col"><a class="btn btn-dark" href="/">Go Back</a></div>
+                <div class="col"><a class="btn btn-dark" href="<%=referer%>">Go Back</a></div>
             </div>
         </div>
-    </section>
-    </main>
-    <%-include ("../partials/foot.ejs") %>
-    <%-include ("../partials/scripts.ejs")%>
+    
+    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
 </body>
 
 </html>

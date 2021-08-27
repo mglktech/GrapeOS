@@ -5,10 +5,15 @@ const api = require("../controllers/api.js");
 
 //API ROOT ROUTES
 //router.get("/", FiveM.index_get);
-router.get("/addServer/:ip/:discordID", api.addServer); //
-router.get("/pingServer/:id", api.fivem_get);
-router.get("/playerInfo/:vanityUrlCode", api.db_onlinePlayers_get);
+router.get("/addServer/:ip/:discordID", api.addServer); // // MOVE THIS TO PROTECTED ROUTES
+//router.get("/pingServer/:id", api.fivem_get);
+router.get("/playerInfo/:vanityUrlCode", api.db_onlinePlayers_get); // old!
 // FIVEM ROUTES
+
+// Server API Routes
+router.get("/servers/:vanityUrlCode/playerInfo", api.getOnlinePlayerInfo);
+router.get("/servers/:vanityUrlCode/serverInfo", api.getOnlineServerInfo);
+router.get("/players/:id/info", api.getPlayerInfo);
 
 // LastFM Data
 router.get("/lastfm", api.getUserTracks);

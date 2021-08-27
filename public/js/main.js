@@ -1,5 +1,6 @@
 const login = document.querySelector("#login");
 const hlStatus = document.querySelector("#hl-status");
+const r2rrp = document.querySelector("#r2rrp-status");
 const test = document.querySelector("#test");
 const fm = document.querySelector("#filemanager");
 const time = document.querySelector("#time");
@@ -90,7 +91,16 @@ hlStatus.addEventListener("click", () => {
 		title: "HighLife Roleplay Server Status",
 		width: "400px",
 		height: "500px",
-		url: "/api/winbox/hlServerStatus",
+		url: "/public/apps/serverStatus/highlife",
+	});
+});
+
+r2rrp.addEventListener("click", () => {
+	const box = winBox({
+		title: "Rags 2 Riches RP",
+		width: "400px",
+		height: "500px",
+		url: "/public/apps/serverStatus/r2rrp",
 	});
 });
 mdfile.addEventListener("click", () => {

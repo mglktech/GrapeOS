@@ -3,12 +3,114 @@ const discord = require("../config/api/discord");
 const database = require("../config/db");
 const logger = require("emberdyn-logger");
 const lastfmclient = require("lastfm-node-client");
+const fuzzyTime = require("fuzzy-time");
+const serverModel = require("../models/server-model");
+const activityModel = require("../models/activity-model");
+const playerModel = require("../models/player-model");
+const roleModel = require("../models/role-model");
+
+const Moment = require("moment");
 require("dotenv").config();
 /* 
 Provisions:
 - Server IP Address
 - Discord Server ID
 */
+
+/*
+MGLK API
+Used for getting info from places and responding as JSON 
+*/
+const fuzzyTimeOpts = {
+	setMinDays: 4,
+	days: "d",
+	hours: "h",
+	minutes: "m",
+	on: "on",
+	dateFormat: "simple",
+};
+
+const getPlayerInfo = async (id) => {
+	const parseTime = (msec) => {
+		/* Ref: https://stackoverflow.com/questions/1787939/check-time-difference-in-javascript
+		--->> Copied from a post from 12 years ago, still very much relevant today! */
+		var hh = Math.floor(msec / 1000 / 60 / 60);
+		msec -= hh * 1000 * 60 * 60;
+		var mm = Math.floor(msec / 1000 / 60);
+		msec -= mm * 1000 * 60;
+		var ss = Math.floor(msec / 1000);
+		msec -= ss * 1000;
+		if (hh > 0) {
+			return `${hh}h ${mm}m`;
+		} else if (mm > 0) {
+			return `${mm}m`;
+		}
+		return `${ss}s`;
+	};
+
+	let plyD = await playerModel
+		.findById(id)
+		.populate({
+			path: "discord.roles",
+			options: {
+				select: "name color",
+				sort: { rawPosition: "desc" },
+			},
+		})
+		.exec();
+	//console.log(JSON.stringify(plyD));
+	//let activityData = await activityModel.find({ player: plyD }).exec();
+	let actD = await activityModel
+		.find({ player: plyD })
+		.populate("server")
+		.sort({ onlineAt: "desc" })
+		.exec();
+	let svData = {
+		hrsInFortnite: 0,
+		hrsOnRecord: 0,
+	};
+	let rec = {
+		shifts: [],
+	};
+	let recs = [];
+	for (let act of actD) {
+		let [onlineAt, offlineAt] = [
+			new Moment(act.onlineAt),
+			new Moment(act.offlineAt),
+		];
+		let diff = offlineAt - onlineAt;
+		let two_weeks_ago = Date.now() - 1209600000;
+		if (act.onlineAt > two_weeks_ago) {
+			svData.hrsInFortnite += Math.floor(diff / 1000 / 60 / 60);
+		}
+		svData.hrsOnRecord += Math.floor(diff / 1000 / 60 / 60);
+		svData.id = act.server.discord.id;
+		svData.icon = act.server.discord.icon; // ??? Gonna be a bug here with same player on multiple servers!
+		svData.name = act.server.discord.name;
+		let this_date = onlineAt.format("DD-MM-YYYY");
+		let shift = {
+			currentlyOnline: act.currentlyOnline,
+			id: act.sv_id,
+			onlineAt: onlineAt.format("HH:mm"),
+			offlineAt: offlineAt.format("HH:mm"),
+			duration: parseTime(diff),
+		};
+		if (recs.length > 0) {
+			if (this_date == recs[recs.length - 1].date) {
+				rec.shifts.push(shift);
+				continue;
+			}
+		}
+		rec = {
+			date: this_date,
+			shifts: [shift],
+		};
+		recs.push(rec);
+	}
+	//console.log(JSON.stringify(recs));
+	return { plyD, recs, svData };
+};
+//getPlayerInfo("6104826fb516711b406cdf16");
 const getUserTracks = async (req, res) => {
 	const lastfm = new lastfmclient(process.env.lastfm_api_key);
 	let userRecentTracks = await lastfm.userGetRecentTracks({
@@ -17,6 +119,63 @@ const getUserTracks = async (req, res) => {
 	});
 	let recentTrack = userRecentTracks.recenttracks.track[0];
 	res.json(recentTrack);
+};
+
+const getOnlineServerInfo = async (req, res) => {
+	const server = await serverModel
+		.findOne({ "discord.vanityUrlCode": req.params.vanityUrlCode })
+		.exec();
+	let ip = server.fiveM.ips[0];
+	if (!(await getServerInfo(ip))) {
+		// is the server actually online?
+		res.json({
+			online: false,
+		});
+		return;
+	}
+	let maxClients = server.fiveM.vars.get("sv_maxClients") || 0;
+	let queue = server.fiveM.vars.get("hl_queuecount") || -1;
+	let players = server.fiveM.vars.get("hl_players") || -1;
+	let res_data = {
+		online: true,
+		maxClients,
+		queue,
+		players,
+	};
+	res.json(res_data);
+};
+
+const getOnlinePlayerInfo = async (req, res) => {
+	const server = await serverModel
+		.find({ "discord.vanityUrlCode": req.params.vanityUrlCode })
+		.exec();
+	//console.log(server);
+	const activityData = await activityModel
+		.find({ server, currentlyOnline: true })
+		.populate({
+			path: "player",
+			// populate: {
+			// 	path: "discord.roles",
+			// 	options: {
+			// 		sort: { rawPosition: "desc" },
+			// 	},
+			// },
+		})
+		.sort({ sv_id: "desc" })
+		.exec();
+	let res_data = [];
+	for (let activity of activityData) {
+		let time = fuzzyTime(activity.onlineAt, fuzzyTimeOpts);
+		let data_player = {
+			sv_id: activity.sv_id,
+			id: activity.player._id,
+			name: activity.player.discord.nickname || activity.player.fiveM.name,
+			time,
+		};
+		res_data.push(data_player);
+	}
+	//console.log(res_data);
+	res.json(res_data);
 };
 
 const db_onlinePlayers_get = async (req, res) => {
@@ -62,7 +221,7 @@ const fivem_cron_get = async (serverId) => {
 	}
 
 	const fiveM_server = await fiveM_getServerPlayerInfo(server.fiveM.ips);
-	if (!fiveM_server.serverInfo) {
+	if (!fiveM_server) {
 		logger.warn("Server Offline");
 		return;
 	}
@@ -313,4 +472,7 @@ module.exports = {
 	db_onlinePlayers_get,
 	fivem_cron_get,
 	getUserTracks,
+	getOnlinePlayerInfo,
+	getOnlineServerInfo,
+	getPlayerInfo,
 };
