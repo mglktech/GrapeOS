@@ -1,10 +1,11 @@
 const CronJobManager = require("cron-job-manager");
+const cronTaskModel = require("../models/crontask-model");
 const api = require("../controllers/api.js");
 const logger = require("emberdyn-logger");
 const db = require("../config/db");
 
 const syncTasks = async () => {
-	let tasks = await db.getCrons();
+	let tasks = await cronTaskModel.getAll();
 	for (let task of tasks) {
 		syncTaskToEnabledFlag(task);
 	}

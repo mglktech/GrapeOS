@@ -1,9 +1,10 @@
+const timingFuncs = require("../bin/funcs/timing-funcs"); // Custom Timestamp To String Methods
 const fiveM = require("../config/api/fivem");
 const discord = require("../config/api/discord");
 const database = require("../config/db");
 const logger = require("emberdyn-logger");
 const lastfmclient = require("lastfm-node-client");
-const fuzzyTime = require("fuzzy-time");
+
 const serverModel = require("../models/server-model");
 const activityModel = require("../models/activity-model");
 const playerModel = require("../models/player-model");
@@ -21,33 +22,8 @@ Provisions:
 MGLK API
 Used for getting info from places and responding as JSON 
 */
-const fuzzyTimeOpts = {
-	setMinDays: 4,
-	days: "d",
-	hours: "h",
-	minutes: "m",
-	on: "on",
-	dateFormat: "simple",
-};
 
 const getPlayerInfo = async (id) => {
-	const parseTime = (msec) => {
-		/* Ref: https://stackoverflow.com/questions/1787939/check-time-difference-in-javascript
-		--->> Copied from a post from 12 years ago, still very much relevant today! */
-		var hh = Math.floor(msec / 1000 / 60 / 60);
-		msec -= hh * 1000 * 60 * 60;
-		var mm = Math.floor(msec / 1000 / 60);
-		msec -= mm * 1000 * 60;
-		var ss = Math.floor(msec / 1000);
-		msec -= ss * 1000;
-		if (hh > 0) {
-			return `${hh}h ${mm}m`;
-		} else if (mm > 0) {
-			return `${mm}m`;
-		}
-		return `${ss}s`;
-	};
-
 	let plyD = await playerModel
 		.findById(id)
 		.populate({
@@ -93,7 +69,7 @@ const getPlayerInfo = async (id) => {
 			id: act.sv_id,
 			onlineAt: onlineAt.format("HH:mm"),
 			offlineAt: offlineAt.format("HH:mm"),
-			duration: parseTime(diff),
+			duration: timingFuncs.parseTime(diff),
 		};
 		if (recs.length > 0) {
 			if (this_date == recs[recs.length - 1].date) {
@@ -122,11 +98,9 @@ const getUserTracks = async (req, res) => {
 };
 
 const getOnlineServerInfo = async (req, res) => {
-	const server = await serverModel
-		.findOne({ "discord.vanityUrlCode": req.params.vanityUrlCode })
-		.exec();
+	const server = await serverModel.getByVanityUrlCode(req.params.vanityUrlCode);
 	let ip = server.fiveM.ips[0];
-	if (!(await getServerInfo(ip))) {
+	if (!server.fiveM.online) {
 		// is the server actually online?
 		res.json({
 			online: false,
@@ -146,26 +120,18 @@ const getOnlineServerInfo = async (req, res) => {
 };
 
 const getOnlinePlayerInfo = async (req, res) => {
-	const server = await serverModel
-		.find({ "discord.vanityUrlCode": req.params.vanityUrlCode })
-		.exec();
+	const server = await serverModel.getByVanityUrlCode(req.params.vanityUrlCode);
 	//console.log(server);
+	// const t1 = Date.now();
 	const activityData = await activityModel
 		.find({ server, currentlyOnline: true })
-		.populate({
-			path: "player",
-			// populate: {
-			// 	path: "discord.roles",
-			// 	options: {
-			// 		sort: { rawPosition: "desc" },
-			// 	},
-			// },
-		})
-		.sort({ sv_id: "desc" })
-		.exec();
+		.populate("player", "discord.nickname fiveM.name")
+		.sort({ sv_id: "desc" });
+	// const t2 = Date.now();
+	// console.log(`activityData took ${t2 - t1}ms to complete`);
 	let res_data = [];
 	for (let activity of activityData) {
-		let time = fuzzyTime(activity.onlineAt, fuzzyTimeOpts);
+		let time = timingFuncs.parseTime(Date.now() - activity.onlineAt);
 		let data_player = {
 			sv_id: activity.sv_id,
 			id: activity.player._id,
@@ -205,6 +171,7 @@ const getServerInfo = async (ip) => {
 		let data = await srv.getInfo_prune();
 		delete data.icon; // Rough to squeeze data for development
 		data.ips = [ip];
+
 		return data;
 	} catch (err) {
 		logger.warn(`fiveM Api::getServerinfo:: ${err}`);
@@ -219,9 +186,9 @@ const fivem_cron_get = async (serverId) => {
 		logger.warn("Error: No such server");
 		return;
 	}
-
 	const fiveM_server = await fiveM_getServerPlayerInfo(server.fiveM.ips);
 	if (!fiveM_server) {
+		serverModel.setOnline(serverId, false);
 		logger.warn("Server Offline");
 		return;
 	}
@@ -330,6 +297,7 @@ function hl_getJobs(vars) {
 function syncServerInfo(srv, serverInfo) {
 	const fiveM = new Map(Object.entries(serverInfo));
 	let serverObj = { fiveM };
+	serverModel.setOnline(srv._id, true);
 	database.syncServer(srv, serverObj);
 }
 

@@ -26,56 +26,19 @@ const connection = mongoose
 	});
 
 connection.getCrons = async () => {
-	let crons = await cronTaskModel.find().exec();
-	let cronData = [];
-	//console.log(`CRONS:`);
-
-	for (let cron of crons) {
-		let dataObj = Object.fromEntries(cron.data);
-		let newCron = {
-			_id: cron._id,
-			name: cron.name,
-			exp: cron.exp,
-			cmd: cron.cmd,
-			data: dataObj,
-			enabled: cron.enabled,
-		};
-		cronData.push(newCron);
-		//console.log(newCron);
-	}
-	return cronData;
+	return await cronTaskModel.getAll();
 };
 
 connection.getCron = async (_id) => {
-	let cron = await cronTaskModel.findById(_id).exec();
-	let dataObj = Object.fromEntries(cron.data);
-	let newCron = {
-		_id: cron._id,
-		name: cron.name,
-		exp: cron.exp,
-		cmd: cron.cmd,
-		data: dataObj,
-		enabled: cron.enabled,
-	};
-	return newCron;
+	return await cronTaskModel.getById(_id);
 };
 
 connection.toggleCron = async (_id) => {
-	let cron = await cronTaskModel.findById(_id).exec();
-	let cronDataID = Object.fromEntries(cron.data).id || "";
-	if (cron) {
-		if (cron.enabled) {
-			connection.offlineEveryone(cronDataID);
-		}
-		cron.enabled = !cron.enabled;
-		cron.save();
-	}
+	let dataId = await cronTaskModel.toggle(_id);
+	connection.offlineEveryone(dataId);
 };
 connection.addCron = async (cron) => {
-	const newCronJob = new cronTaskModel(cron);
-	console.log("New CRON:");
-	console.log(newCronJob);
-	newCronJob.save();
+	cronTaskModel.add(cron);
 };
 
 connection.delCron = (_id) => {
@@ -207,10 +170,7 @@ connection.savePlayer = (data_fiveM, data_discord = null) => {
 };
 
 connection.getServer = (id) => {
-	return serverModel
-		.findById(id)
-		.exec()
-		.catch((err) => HandleErrors("getServer(Database)", err));
+	return serverModel.getById(id);
 };
 connection.getServerByVUrl = (vUrl) => {
 	let sv_data = serverModel

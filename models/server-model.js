@@ -22,6 +22,7 @@ const mySchema = new Schema({
 			type: Map,
 			of: String,
 		},
+		online: Boolean,
 	},
 	discord: {
 		id: String,
@@ -52,48 +53,64 @@ const mySchema = new Schema({
 		],
 	},
 });
-const myOldSchema = new Schema(
-	{
-		ip: String,
-		online: Boolean,
-		info: {
-			enhancedHostSupport: Boolean,
-			icon: String,
-			resources: [String],
-			server: String,
-			vars: {
-				type: Map,
-				of: String,
-			},
-			version: Number,
-		},
-		players: [
-			{
-				current_id: Number,
-				name: String,
-				online: Boolean,
-				ping: Number,
-				identifiers: [String],
-				lastCameOnline: Number,
-				activity: [
-					{
-						onlineAt: Number,
-						offlineAt: Number,
-						duration: {
-							type: Number,
-							default: function () {
-								return this.offlineAt - this.onlineAt;
-							},
-						},
-						session_id: Number,
-					},
-				],
-			},
-		],
-	},
-	{ timestamps: true }
-);
+
 // create model based on schema
 const model = mongoose.model(modelName, mySchema);
 
+model.setOnline = (_id, online) => {
+	//console.log(`Setting Online:${online} for ${_id}`);
+	model.findByIdAndUpdate(_id, { "fiveM.online": online });
+};
+
+model.getById = async (id) => {
+	//console.log("new method");
+	return model.findById(id);
+};
+model.getByVanityUrlCode = (urlCode) => {
+	return model.findOne({ "discord.vanityUrlCode": urlCode });
+};
+model.getOne = (scope) => {};
+
 module.exports = model;
+
+// const myOldSchema = new Schema(
+// 	{
+// 		ip: String,
+// 		online: Boolean,
+// 		info: {
+// 			enhancedHostSupport: Boolean,
+// 			icon: String,
+// 			resources: [String],
+// 			server: String,
+// 			vars: {
+// 				type: Map,
+// 				of: String,
+// 			},
+// 			version: Number,
+// 		},
+// 		players: [
+// 			{
+// 				current_id: Number,
+// 				name: String,
+// 				online: Boolean,
+// 				ping: Number,
+// 				identifiers: [String],
+// 				lastCameOnline: Number,
+// 				activity: [
+// 					{
+// 						onlineAt: Number,
+// 						offlineAt: Number,
+// 						duration: {
+// 							type: Number,
+// 							default: function () {
+// 								return this.offlineAt - this.onlineAt;
+// 							},
+// 						},
+// 						session_id: Number,
+// 					},
+// 				],
+// 			},
+// 		],
+// 	},
+// 	{ timestamps: true }
+// );

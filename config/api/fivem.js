@@ -83,6 +83,7 @@ class Server {
 						resources: body.data.resources,
 						enhancedHostSupport: body.data.enhancedHostSupport,
 						//icon: body.data.icon,
+						online: true,
 						server: body.data.server,
 						vars,
 					};
