@@ -1,19 +1,12 @@
 const Discord = require("discord.js");
-const client = new Discord.Client({ _tokenType: "" });
+const client = new Discord.Client({
+	_tokenType: "",
+	intents: "GUILD_MESSAGES",
+});
 const token = process.env.discord_token;
-const guildID = process.env.guild_id;
 const logger = require("emberdyn-logger");
 
 client.login(token);
-client.on("ready", async () => {
-	logger.access(`[DISCORD]: Logged in as ${client.user.tag}!`);
-	//const Guilds = client.guilds.cache.map((guild) => guild);
-	//console.log(Guilds);
-	//const test = await client.fetchMember(guild, "252894159713730560");
-	//const role = await client.fetchRole(guild, "534477447069171727");
-	//console.log(test);
-});
-
 client.fetchGuild = (guildID) => {
 	return client.guilds
 		.fetch(guildID)

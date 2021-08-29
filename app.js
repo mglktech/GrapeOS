@@ -22,6 +22,7 @@ require("dotenv").config();
 require("./config/db");
 require("./config/strategies/localStrategy");
 require("./config/api/discord.js");
+require("./bin/highlife-dragtimes");
 require("./config/cron.js");
 let app = express();
 

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 //const FiveM = require("../controllers/api/fivem.js"); // "../controllers/api/fivem"
 const api = require("../controllers/api.js");
-
+const model = require("../models/hl-dragtime-model");
 //API ROOT ROUTES
 //router.get("/", FiveM.index_get);
 router.get("/addServer/:ip/:discordID", api.addServer); // // MOVE THIS TO PROTECTED ROUTES
@@ -14,6 +14,25 @@ router.get("/playerInfo/:vanityUrlCode", api.db_onlinePlayers_get); // old!
 router.get("/servers/:vanityUrlCode/playerInfo", api.getOnlinePlayerInfo);
 router.get("/servers/:vanityUrlCode/serverInfo", api.getOnlineServerInfo);
 router.get("/players/:id/info", api.getPlayerInfo);
+
+// Bespoke Routes
+
+router.get("/bespoke/highlife/dragtimes/", (req, res) => {
+	res.render("pages/bespoke/highlife/hl-dragtimes");
+});
+
+router.get("/bespoke/highlife/dragtimes/get", async (req, res) => {
+	let data = await model.get();
+	res.json(data);
+});
+router.get(
+	"/bespoke/highlife/dragtimes/sortsearch/:sort/:search",
+	async (req, res) => {
+		console.log(req.params.sort, req.params.search);
+		let data = await model.get(req.params.sort, req.params.search);
+		res.json(data);
+	}
+);
 
 // LastFM Data
 router.get("/lastfm", api.getUserTracks);

@@ -6,6 +6,7 @@ const fm = document.querySelector("#filemanager");
 const time = document.querySelector("#time");
 const date = document.querySelector("#date");
 const spotify = document.querySelector("#spotify");
+const hlDragTimes = document.querySelector("#hl-drag-times");
 
 window.document.addEventListener("formHandler", handleForm, false);
 async function handleForm(e) {
@@ -92,6 +93,16 @@ hlStatus.addEventListener("click", () => {
 		width: "400px",
 		height: "500px",
 		url: "/public/apps/serverStatus/highlife",
+	});
+});
+
+hlDragTimes.addEventListener("click", () => {
+	const box = winBox({
+		title: "Highlife Live Drag Times",
+		width: "1024px",
+		height: "800px",
+		x: "center",
+		url: "/api/bespoke/highlife/dragtimes/",
 	});
 });
 
