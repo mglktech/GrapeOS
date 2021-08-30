@@ -6,7 +6,7 @@ const logger = require("emberdyn-logger");
 
 const index_get = (req, res) => {};
 
-/// LOW LEVEL DATABASE ACCESS FUNCTIONS SHOULD BE PLACED IN CONFIG.
+/// LOW LEVEL DATABASE ACCESS FUNCTIONS SHOULD BE PLACED IN MODELS
 
 const fivem_get = (req, res) => {};
 // const fivem_getPlayerCount = async (req, res) => {

@@ -2,21 +2,21 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 const api = require("../controllers/api");
-router.get("/home", (req, res) => res.render("pages/new_index"));
-router.get("/apps/serverStatus/:vUrlCode", async (req, res) => {
+
+router.get("/serverStatus/:vUrlCode", async (req, res) => {
 	let sv_info = await db.getServerByVUrl(req.params.vUrlCode);
-	res.render("pages/server-status", { sv_info });
+	res.render("apps/server-status/server-status", { sv_info });
 });
-router.get("/apps/serverStatus/:vUrlCode/info", async (req, res) => {
+router.get("/serverStatus/:vUrlCode/info", async (req, res) => {
 	let sv_info = await db.getServerByVUrl(req.params.vUrlCode);
 	// deliver as Information window
 });
-router.get("/apps/serverStatus/:vUrlCode/search", async (req, res) => {
+router.get("/serverStatus/:vUrlCode/search", async (req, res) => {
 	let sv_info = await db.getServerByVUrl(req.params.vUrlCode);
 	// deliver as searchable content window
 });
 
-router.get("/apps/players/:id/info", async (req, res) => {
+router.get("/serverStatus/players/:id/info", async (req, res) => {
 	let collectedData = await api.getPlayerInfo(req.params.id);
 	let data = {
 		referer: req.headers.referer,
@@ -24,7 +24,7 @@ router.get("/apps/players/:id/info", async (req, res) => {
 		activityData: collectedData.recs,
 		svData: collectedData.svData,
 	};
-	res.render("pages/player-info", data);
+	res.render("apps/server-status/player-info", data);
 });
 
 module.exports = router;

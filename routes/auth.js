@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const passport = require("passport");
-const controller = require("../controllers/account");
+const controller = require("../controllers/auth");
 const isAuth = require("../config/auth").isAuth;
 const isAdmin = require("../config/auth").isAdmin;
 
@@ -13,10 +13,10 @@ router.get("/logout", controller.logout_get);
 
 router.post(
 	"/login",
-	passport.authenticate("local", { failureRedirect: "/account/login" }),
+	passport.authenticate("local", { failureRedirect: "/auth/login" }),
 	function (req, res) {
 		console.log(`${req.user.username} has logged in.`);
-		res.redirect("/account/home");
+		res.redirect("/home");
 	}
 );
 module.exports = router;

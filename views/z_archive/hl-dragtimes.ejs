@@ -80,6 +80,7 @@
                 <div class="table-responsive">
                     <table class="table table-striped table-hover table-dark table-sm table-bordered text-nowrap">
                         <caption>All times are represented in Seconds</caption>
+                        <caption>Data is collected dynamically from Discord and stored using MongoDB</caption>
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -268,6 +269,7 @@
             tBody.innerHTML = htmlData;
         }
         getData();
+        window.setInterval(getData(sort,searchText),10000);
     </script>
 
 </body>

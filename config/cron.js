@@ -2,7 +2,7 @@ const CronJobManager = require("cron-job-manager");
 const cronTaskModel = require("../models/crontask-model");
 const api = require("../controllers/api.js");
 const logger = require("emberdyn-logger");
-const db = require("../config/db");
+//const db = require("../config/db");
 
 const syncTasks = async () => {
 	let tasks = await cronTaskModel.getAll();
@@ -19,16 +19,13 @@ const syncTaskToEnabledFlag = (task) => {
 	let id = task._id.toString();
 	let running = manager.jobs[id].running || false;
 	let enabled = task.enabled;
-	//console.log(manager);
-	//console.log(task);
-	//console.log(`id: ${id} running: ${running} enabled: ${enabled}`);
 	if (running == false && enabled == true) {
 		manager.jobs[id].start();
-		console.log(`Job ID: ${id} started.`);
+		console.log(`CRON Task ${task.name} Started.`);
 	}
 	if (running == true && enabled == false) {
 		manager.jobs[id].stop();
-		console.log(`Job ID: ${id} stopped.`);
+		console.log(`CRON Task ${task.name} stopped.`);
 	}
 };
 
@@ -37,15 +34,11 @@ const createTask = (task) => {
 		manager.add(task._id.toString(), task.exp, function () {
 			api.fivem_cron_get(task.data.id);
 		});
-		console.log(
-			`Job ID: ${task._id.toString()} has been created. (pingFiveMServer)`
-		);
+		console.log(`CRON Task ${task.name} has been created. (pingFiveMServer)`);
 	}
 	if (task.cmd == "pingScrobbler") {
 		manager.add(task._id.toString(), task.exp, function () {});
-		console.log(
-			`Job ID: ${task._id.toString()} has been created. (pingScrobbler)`
-		);
+		console.log(`CRON Task ${task.name} has been created. (pingScrobbler)`);
 	}
 };
 
@@ -70,50 +63,6 @@ const scheduledTasks = [
 	// 	active: true,
 	// },
 ];
-
-const ScheduleTask = (task) => {
-	if (task.cmd == "pingFiveMServer") {
-		var job = new CronJob(
-			task.exp,
-			function () {
-				api.fivem_cron_get(task.data.id);
-			},
-			null,
-			true
-		);
-
-		job.start();
-	}
-	if (task.cmd == "pingScrobbler") {
-		let job = new CronJob(
-			task.exp,
-			function () {
-				//logger.info("Ping " + task.data.api_key);
-			},
-			null,
-			true
-		);
-
-		job.start();
-	}
-	logger.info(task.cmd + " successfully initialized.");
-};
-
-const ScheduleTasks = (tasks) => {
-	for (let task of tasks) {
-		ScheduleTask(task);
-	}
-};
-
-const MapItems = (items) => {
-	let map = [];
-
-	items.forEach((id) => {
-		const split = id.split(":");
-		map.push(split);
-	});
-	return new Map(map);
-};
 
 let manager = new CronJobManager("head", "* * * * * *", syncTasks, {
 	start: true,

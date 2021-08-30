@@ -22,7 +22,7 @@
 
 .wb-title {
 	background: transparent;
-	font-size: 14px;
+	font-size: 1rem;
 	/* text-transform: uppercase; */
 	font-weight: 200;
 	z-index: 1;
@@ -30,6 +30,7 @@
 .wb-icon {
 	background-color: #212529;
 	border-radius: 0.5rem 0.5rem 0 0;
+
 	/* box-shadow: 0 14px 28px rgba(0, 0, 0, 0.25), 0 10px 10px rgba(0, 0, 0, 0.22); */
 }
 
@@ -45,11 +46,19 @@
 	border-radius: 0 0.5rem 0 0;
 }
 .wb-icon span {
-	opacity: 0.65;
+	opacity: 0.5;
 }
 
 .wb-icon span:hover {
 	opacity: 1;
+}
+
+.wb-min,
+.wb-max,
+.wb-close {
+	background-size: 1.5rem auto;
+	margin-left: 0.5rem !important;
+	margin-right: 0.5rem !important;
 }
 
 /* .wb-min {

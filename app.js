@@ -7,17 +7,20 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const passport = require("passport");
 const logger = require("emberdyn-logger");
-const topLevelRoutes = require("./routes/top-level-routes");
-const accountRoutes = require("./routes/account");
+const topRoutes = require("./routes/top");
+//const accountRoutes = require("./routes/account");
+const appsRoutes = require("./routes/apps");
 const authRoutes = require("./routes/auth");
 const apiRoutes = require("./routes/api");
-const articleRoutes = require("./routes/articles");
-const publicRoutes = require("./routes/public");
-const protectedRoutes = require("./routes/protected");
+//const articleRoutes = require("./routes/articles");
+const binRoutes = require("./routes/bin");
+//const publicRoutes = require("./routes/public");
+//const protectedRoutes = require("./routes/protected");
+
 //const projectRoutes = require("./routes/projects");
 //const demoRoutes = require("./routes/demos");
-const { resolveInclude } = require("ejs");
 
+require("ejs");
 require("dotenv").config();
 require("./config/db");
 require("./config/strategies/localStrategy");
@@ -60,20 +63,23 @@ app.use((req, res, next) => {
 });
 
 // Index Routing
-app.use("/", topLevelRoutes);
-app.use("/public", publicRoutes);
-app.use("/account", accountRoutes);
+app.use("/", topRoutes);
+
+//app.use("/public", publicRoutes);
+//app.use("/account", accountRoutes);
+app.use("/apps", appsRoutes);
 app.use("/auth", authRoutes);
 app.use("/api", apiRoutes);
-app.use("/articles", articleRoutes);
-app.use("/protected", protectedRoutes);
+//app.use("/articles", articleRoutes);
+app.use("/bin", binRoutes);
+//app.use("/protected", protectedRoutes);
 //app.use("/projects", projectRoutes);
 //app.use("/demos", demoRoutes);
 
 app.use((req, res) => {
 	// must manually set 404 status code
 	//res.status(404).sendFile(`${path}404.html`, { root });
-	res.render("./pages/404", { referer: req.headers.referer });
+	res.render("pages/404", { referer: req.headers.referer });
 });
 
 app.listen(PORT, () => logger.system(`Listening on ${PORT}`));

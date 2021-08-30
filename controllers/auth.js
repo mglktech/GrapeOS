@@ -3,12 +3,14 @@ const genPassword = require("../config/passwordUtils").genPassword;
 const User = require("../models/user-model");
 
 const setup = async (req, res) => {
-	// const exists = await User.exists({ username: process.env.super_USERNAME });
-	// if (exists) {
-	// 	console.log("Admin account already exists!");
-	// 	res.redirect("/login");
-	// 	return; 
-	// }
+	const exists = await User.exists({ username: process.env.super_USERNAME });
+	if (exists) {
+		console.log(
+			"Someone tried to setup the super account but it has already been created!"
+		);
+		res.redirect("/auth/login");
+		return;
+	}
 	const saltHash = genPassword(process.env.super_PASSWORD);
 	const salt = saltHash.salt;
 	const hash = saltHash.hash;
@@ -19,9 +21,7 @@ const setup = async (req, res) => {
 		admin: true,
 	});
 
-	
 	console.log(`Creating admin account:`);
-	console.log(newUser);
 	newUser
 		.save()
 		.then((user) => {
@@ -30,7 +30,7 @@ const setup = async (req, res) => {
 		})
 		.catch((err) => {
 			console.log(`ERROR: 	${err}`);
-			res.redirect("/auth/login");
+			res.redirect("/");
 		});
 };
 
