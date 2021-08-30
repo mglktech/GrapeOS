@@ -1,7 +1,7 @@
 {
-  "name": "node-js-getting-started",
+  "name": "grape-os",
   "version": "0.3.0",
-  "description": "A sample Node.js app using Express 4",
+  "description": "a Web service in the style of an operating system",
   "engines": {
     "node": "14.x"
   },
