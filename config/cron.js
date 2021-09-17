@@ -25,7 +25,7 @@ const syncTaskToEnabledFlag = (task) => {
 	}
 	if (running == true && enabled == false) {
 		manager.jobs[id].stop();
-		console.log(`CRON Task ${task.name} stopped.`);
+		console.log(`CRON Task ${task.name} Stopped.`);
 	}
 };
 

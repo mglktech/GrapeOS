@@ -10,8 +10,7 @@ const mySchema = new Schema(
 	{
 		name: String, // short name for selection
 		type: String, // type of icon eg: img, icon
-		src: String, // src of img
-		class: String, // class of icon
+		typeData: String,
 	},
 	{
 		timestamps: false,
@@ -21,6 +20,35 @@ const mySchema = new Schema(
 // create model based on schema
 const model = mongoose.model(modelName, mySchema);
 
+model.setup = async () => {
+	const exists = await model.findOne({ name: "default" }, "_id");
+	if (exists) {
+		return exists._id;
+	}
+	console.log("A new default icon has been created.");
+	new model({
+		name: "default",
+		type: "icon",
+		typeData: "fa fa-user",
+	})
+		.save()
+		.then((result) => result);
+};
+
+model.getAll = async () => {
+	return funcs.ConvertToObjects(await model.find().sort({ name: "asc" }));
+};
+model.getById = async (_id) => {
+	let icon = await model.findById(_id);
+	return icon.toObject({ flattenMaps: true });
+};
+model.add = (icon) => {
+	const newIcon = new model(icon);
+	newIcon.save();
+};
+model.delete = (_id) => {
+	model.findByIdAndRemove(_id);
+};
 // const shortcut = {
 //     text: "Underlying text of shortcut",
 //     icon:"objectId of Icon",

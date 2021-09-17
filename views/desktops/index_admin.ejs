@@ -17,6 +17,10 @@
 			class="sp-subbrand">Powered By</span><span class="sp-brand">&lt;grapeOS/&gt;</span></div>
 	<div class="desktop-icons">
 		<div class="div-icon" id="taskScheduler"><img src="/assets/img/vs_profile.svg"><span>Task Scheduler</span></div>
+		<div class="div-icon" id="iconManager"><img src="/assets/img/vs_profile.svg"><span>Icon Manager</span></div>
+		<div class="d-inline-flex flex-column align-items-center p-2" id="shortcut" style="cursor: pointer;"><i
+			class="fa fa-folder-open shadow" style="font-size: 3rem"></i><span
+			class="text-nowrap shadow">Highlife Roleplay</span></div>
 	</div>
 	<div class="navbar-bottom"><img class="taskbar-start" src="/assets/img/Emoji%20(1).svg">
 		<div class="taskbar-right align-items-center">
@@ -30,6 +34,7 @@
 	<script>
 		
 		const taskScheduler = document.querySelector("#taskScheduler");
+		const iconManager = document.querySelector("#iconManager");
 		const spotify = document.querySelector("#spotify");
 		const opts = {
 			spotify: {
@@ -61,6 +66,13 @@
 				x: "center",
 				url: "/bin/tasks/view",
 			},
+			iconManager: {
+				title: "Icon Manager",
+				width: "400px",
+				height: "520px",
+				x: "center",
+				url: "/bin/icons/view",
+			},
 		};
 		
 		spotify.addEventListener("click", () => {
@@ -72,6 +84,9 @@
 		});
 		taskScheduler.addEventListener("click", () => {
 			const box = winBox(opts.taskScheduler);
+		});
+		iconManager.addEventListener("click", () => {
+			const box = winBox(opts.iconManager);
 		});
 		const winBox = (opts) => { // Code to apply some default options for smaller screen sizes
 			const defaultOpts = {
@@ -86,6 +101,15 @@
 			//console.log(allOpts);
 			return new WinBox(allOpts);
 		};
+		const icon = document.querySelector("#shortcut");
+        icon.addEventListener("click", () => {
+            const box = winBox({
+                title: "HighLife Roleplay",
+                width: "400px",
+                height: "500px",
+                url: "/apps/folder",
+            });
+        });
 	</script>
 </body>
 

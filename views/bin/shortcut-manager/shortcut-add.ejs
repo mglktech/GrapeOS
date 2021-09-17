@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%-include("../../partials/head")%>
+
+<body>
+    <div class="card textlight bg-dark text-light min-vh-100">
+        <div class="card-header">
+            <h5 class="mb-0">Add Shortcut</h5>
+        </div>
+        <div class="card-body d-flex flex-column">
+            <div id="iconWrapper">
+                
+            </div>
+            
+            <form method="post" action="/bin/shortcuts/add">
+                <div class="row mt-3 mb-2">
+                    <div class="col-8">
+                        <div class="input-group input-group-sm p-1"><span class="input-group-text">Name</span><input class="form-control" name="name"type="text"></div><select id = "formSelectIcon"class="form-select p-1" name="icon">
+                            <% icons.forEach(icon => {%>
+                                <option value="<%=icon._id%>"><%=icon.name%></option>
+                            <%})%>
+                            
+                        </select>
+                        <div>
+                            <h6>Winbox</h6>
+                            <div>
+                                <div class="input-group input-group-sm"><span class="input-group-text">Title</span><input name="winbox.title"class="form-control" type="text"></div>
+                                <div class="input-group input-group-sm"><span class="input-group-text">Width</span><input name="winbox.width" class="form-control" type="text"></div>
+                                <div class="input-group input-group-sm"><span class="input-group-text">Height</span><input name="winbox.height" class="form-control" type="text"></div>
+                                <div class="input-group input-group-sm"><span class="input-group-text">URL:</span><input name="winbox.url"class="form-control" type="text"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-check"><input class="form-check-input" type="radio" checked="" name="userType" value="Public">
+                            <label class="form-check-label">Public</label></div>
+                        <div class="form-check"><input class="form-check-input" type="radio" name="userType"value="Private"><label class="form-check-label">Private</label></div>
+                        <div class="form-check"><input class="form-check-input" type="radio" name="userType" value="Admin"><label class="form-check-label">Admin</label></div>
+                    </div>
+                </div>
+                <div class="row pt-2">
+                    <div class="col d-flex justify-content-between"><button class="btn btn-secondary btn-lg" onclick="goBack()" type="button"><i class="fa fa-arrow-left"></i></button><button class="btn btn-success btn-lg" type="submit"><i class="fa fa-check"></i></button></div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+    <script>
+            function goBack() {
+                window.history.back();
+            }
+        // On Load, display first icon in the list
+        const iconWrapper = document.querySelector("#iconWrapper");
+        const formSelectIcon = document.querySelector("#formSelectIcon");
+        const icons = <%-JSON.stringify(icons)%>;
+        const imgIconTmplt = (classSrc, type) => {
+            let constr = `<div class="row">
+                <div class="col d-flex justify-content-center align-items-center">`;
+                if(type=="img") {
+                    constr += `<img src="${classSrc}" height="64px">`;
+                }
+                if(type == "icon") {
+                    constr += `<i class="${classSrc}" style="font-size: 4rem;"></i>`;
+                }
+            constr += `</div>
+                </div>
+            `;
+            return constr;
+        };
+        function changeIconWrapper(id = null) {
+            console.log("Icon Wrapper Loaded");
+            if(id == null) {
+                iconWrapper.innerHTML = imgIconTmplt(icons[0].data.iconTypeData, icons[0].data.iconType);
+                return;
+            }
+            let icon = icons.find(({_id}) => _id === id);
+            iconWrapper.innerHTML = imgIconTmplt(icon.data.iconTypeData,icon.data.iconType);
+            
+        }
+        window.addEventListener("load",changeIconWrapper());
+        formSelectIcon.addEventListener("change",() => changeIconWrapper(formSelectIcon.value));
+        //console.log(icons);
+    </script>
+</body>
+
+</html>

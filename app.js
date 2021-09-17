@@ -27,9 +27,10 @@ require("./config/strategies/localStrategy");
 require("./config/api/discord.js");
 require("./bin/highlife-dragtimes");
 require("./config/cron.js");
+
+require("./config/newdbconfig").setup();
 let app = express();
 
-let string = "";
 // DEFAULT CONFIGS
 app.use(express.static(path.join(__dirname, "public"))); // PUBLIC STATIC DIRECTORY
 
@@ -56,11 +57,6 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: true })); // EXTENDED URLENCODING FOR FORMS
-app.use((req, res, next) => {
-	// DEBUGGING
-	//console.log(req.session);
-	next();
-});
 
 // Index Routing
 app.use("/", topRoutes);
@@ -76,10 +72,16 @@ app.use("/bin", binRoutes);
 //app.use("/projects", projectRoutes);
 //app.use("/demos", demoRoutes);
 
-app.use((req, res) => {
+app.use((err, req, res, next) => {
 	// must manually set 404 status code
 	//res.status(404).sendFile(`${path}404.html`, { root });
-	res.render("pages/404", { referer: req.headers.referer });
+
+	console.log(err);
+	res.render("pages/error", {
+		referer: req.headers.referer,
+		code: err.code || 500,
+		message: "internal server error",
+	});
 });
 
 app.listen(PORT, () => logger.system(`Listening on ${PORT}`));

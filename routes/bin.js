@@ -4,43 +4,177 @@ const isAuth = require("../config/auth").isAuth;
 const isAdmin = require("../config/auth").isAdmin;
 const db = require("../config/db");
 const cron = require("../models/crontask-model");
+const icons = require("../models/icon-model");
+const shortcuts = require("../models/shortcut-model");
+const files = require("../models/file-model");
+const use = (fn) => (req, res, next) => {
+	Promise.resolve(fn(req, res, next)).catch(next);
+};
+/*
+----Renderers----
+*/
+// Task Manager
+router.get(
+	"/tasks/view",
+	isAdmin,
+	use(async (req, res) => {
+		let tasks = await cron.getAll();
+		res.render("bin/task-manager/view-tasks", { tasks });
+	})
+);
+router.get(
+	"/tasks/add",
+	isAdmin,
+	use((req, res) => {
+		res.render("bin/task-manager/add-task");
+	})
+);
+router.get(
+	"/tasks/info/:id",
+	isAdmin,
+	use(async (req, res) => {
+		let task = await cron.getById(req.params.id);
+		res.render("bin/task-manager/task-info", { task });
+	})
+);
+/*
+----JSON responses----
+*/
+router.get(
+	"/tasks/get",
+	isAdmin,
+	use(async (req, res) => {
+		let tasks = await cron.getAll();
+		//console.log(tasks);
+		res.json(tasks);
+	})
+);
+/*
+ ----Redirects----
+*/
+router.post(
+	"/tasks/add",
+	isAdmin,
+	use((req, res) => {
+		const task = {
+			name: req.body.name,
+			exp: req.body.exp,
+			cmd: req.body.cmd,
+			data: JSON.parse(req.body.data),
+			enabled: false,
+		};
+		cron.add(task);
+		res.redirect("/bin/tasks/view");
+	})
+);
+router.get(
+	"/tasks/toggle/:id",
+	isAdmin,
+	use(async (req, res) => {
+		await cron.toggle(req.params.id);
+		res.redirect("/bin/tasks/view");
+	})
+);
+router.get(
+	"/tasks/delete/:id",
+	isAdmin,
+	use(async (req, res) => {
+		await cron.delete(req.params.id);
+		res.redirect("/bin/tasks/view");
+	})
+);
 
-router.get("/tasks/get", isAdmin, async (req, res) => {
-	let tasks = await cron.getAll();
-	//console.log(tasks);
-	res.json(tasks);
-});
+/*
+---- Icon Manager ----
+*/
+router.get(
+	"/icons/view",
+	isAdmin,
+	use(async (req, res) => {
+		let iconData = await files.getFiles({type:"icon"});
+		res.render("bin/icon-manager/icons-view", { icons: iconData });
+	})
+);
+router.get(
+	"/icons/add",
+	isAdmin,
+	use((req, res) => {
+		res.render("bin/icon-manager/icons-add");
+	})
+);
 
-router.get("/tasks/add", isAdmin, (req, res) => {
-	res.render("bin/add-task");
-});
-router.post("/tasks/add", isAdmin, (req, res) => {
-	const task = {
-		name: req.body.name,
-		exp: req.body.exp,
-		cmd: req.body.cmd,
-		data: JSON.parse(req.body.data),
-		enabled: false,
-	};
-	cron.add(task);
-	res.redirect("/bin/tasks/view");
-});
+router.post(
+	"/icons/add",
+	isAdmin,
+	use((req, res) => {
+		const new_icon = {
+			name: req.body.iconName,
+			iconType: req.body.iconType,
+			iconTypeData: req.body.iconTypeData,
+		};
+		files.addIcon(new_icon);
+		res.redirect("/bin/icons/view");
+	})
+);
 
-router.get("/tasks/view", isAdmin, async (req, res) => {
-	let tasks = await cron.getAll();
-	res.render("bin/view-tasks", { tasks });
-});
-router.get("/tasks/info/:id", isAdmin, async (req, res) => {
-	let task = await cron.getById(req.params.id);
-	res.render("bin/task-info", { task });
-});
-router.get("/tasks/toggle/:id", isAdmin, async (req, res) => {
-	await cron.toggle(req.params.id);
-	res.redirect("/bin/tasks/view");
-});
-router.get("/tasks/delete/:id", isAdmin, async (req, res) => {
-	await cron.delete(req.params.id);
-	res.redirect("/bin/tasks/view");
-});
+/*
+Shortcut Manager
+*/
+router.get(
+	"/shortcuts/view",
+	isAdmin,
+	use(async (req, res) => {
+		let allShortcuts = await files.getShortcuts();
+		//console.log(allShortcuts);
+		res.render("bin/shortcut-manager/shortcut-view", {
+			shortcuts: allShortcuts,
+		});
+	})
+);
+router.get(
+	"/shortcuts/add",
+	isAdmin,
+	use(async (req, res) => {
+		const allicons = await files.getFiles({type: "icon"});
+		res.render("bin/shortcut-manager/shortcut-add", { icons: allicons });
+	})
+);
+
+router.post(
+	"/shortcuts/add",
+	isAdmin,
+	use((req, res) => {
+
+		let new_file = {
+			name: req.body.name, // short name for selection
+			type:"shortcut",
+			data: {
+				icon: req.body.icon,
+				winbox: {
+					title: req.body["winbox.title"],
+					width: req.body["winbox.width"],
+					height: req.body["winbox.height"],
+					url: req.body["winbox.url"],
+			},
+			}};
+		console.log(req.body.userType);
+		if(req.body.userType == "Public") {
+			new_file.data.requireAuth = false;
+			new_file.data.requireAdmin = false;
+		}
+		if(req.body.userType == "Private") {
+			new_file.data.requireAuth = true;
+			new_file.data.requireAdmin = false;
+		}
+		if(req.body.userType == "Admin") {
+			new_file.data.requireAuth = true;
+			new_file.data.requireAdmin = true;
+		}
+		console.log(new_file);
+		files.addShortcut(new_file);
+		res.redirect("/bin/shortcuts/view");
+	})
+	
+);
 
 module.exports = router;

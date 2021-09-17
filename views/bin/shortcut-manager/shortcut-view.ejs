@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <%-include("../../partials/head")%>
+
+<body>
+    <div class="card textlight bg-dark text-light min-vh-100">
+        <div class="card-header">
+            <h5 class="mb-0">Shortcuts</h5>
+        </div>
+        <div class="card-body p-1">
+            <div class="container-fluid">
+                <% shortcuts.forEach(shortcut => {%>
+                <div class="row">
+                    <div class="col d-flex justify-content-between align-items-center">
+                        <i class="<%=shortcut.icon.data.iconTypeData%>" style="font-size: 50px;">
+                        </i>
+                        <div>
+                            <h5><%=shortcut.name%></h5>
+                            <h6><%=shortcut.data.winbox.url%></h6>
+                        </div>
+                        <div>
+                            <%if(shortcut.data.requireAdmin) {%>
+                            <span>Admin</span>
+                            <%} if(!shortcut.data.requireAuth) {%>
+                            <span>Public</span>
+                            <%}%>
+                        </div>
+                    </div>
+                </div>
+                <%});%>
+            </div>
+            <div class="d-flex flex-row justify-content-center"><a class="btn btn-info btn-lg m-2" role="button" id="btn-add-icon" href="/bin/shortcuts/add"><i class="fa fa-plus"></i></a></div>
+        </div>
+    </div>
+    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
+
+</html>
