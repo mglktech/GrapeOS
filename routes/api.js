@@ -23,7 +23,7 @@ router.get("/players/:id/info", use(api.getPlayerInfo));
 // Bespoke Routes
 
 router.get("/bespoke/highlife/dragtimes/", (req, res) => {
-	res.render("pages/bespoke/highlife/hl-dragtimes");
+	res.render("apps/bespoke/highlife/hl-dragtimes");
 });
 
 router.get(

@@ -24,10 +24,17 @@
             <div class="col-4">
                 <div class="d-inline-flex flex-column align-items-center" id=""></div>
                 <% scs.forEach(sc => {%>
-                    <div class="d-inline-flex flex-column align-items-center p-2" id="<%=sc._id%>" style="cursor: pointer;"><i
-                        class="<%=sc.icon.data.iconTypeData%>" style="font-size: 3rem"></i><span
-                        class="text-nowrap "><%=sc.name%></span></div>
+                    <div class="d-inline-flex flex-column align-items-center p-2" id="<%=sc._id%>" style="cursor: pointer;">
+                    <%if(sc.icon.data.iconType == "img") {%>
+                        <img class="img-fluid" width="50" src="<%=sc.icon.data.iconTypeData%>">
+                    <%}if(sc.icon.data.iconType == "icon"){%>
+                        <i class="<%=sc.icon.data.iconTypeData%>" style="font-size: 3rem"></i>
+                    <%}%>
+                        
+                        <span class="text-nowrap "><%=sc.name%></span>
+                    </div>
                 <%});%>
+                
                 
                 
             </div>
@@ -40,9 +47,11 @@
     <script>
         
 
-        console.log(<%-JSON.stringify(scs)%>);
+        
         function _myFunc(opts) {
-            const box = winBox({opts});
+            console.log("Creating Winbox with the following config:")
+            console.log(opts);
+            winBox(opts);
         }
         const winBox = (opts) => {
             const defaultOpts = {
@@ -64,8 +73,17 @@
         };
         <% scs.forEach(sc => {%>
             document.getElementById("<%=sc._id%>").addEventListener("click", () => {
+                <% if(sc.type === "folder") {%>
+                const box = winBox({ 
+                    title: '<%=sc.name%>', 
+                    width: '640', 
+                    height: '480', 
+                    url: '/folder/<%=sc._id%>' });
+            <%} if(sc.type === "shortcut") {%>
             const box = winBox(<%-JSON.stringify(sc.data.winbox)%>);
+            <%}%>
         });
+        
         <%})%>
         
     </script>

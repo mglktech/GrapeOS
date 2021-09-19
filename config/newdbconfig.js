@@ -9,4 +9,5 @@ module.exports.setup = async () => {
 	await files.setup();
 	//console.log(adminFiles);
 	//console.log(await files.getFileById("61449a59e96bf626089695d9"));
+	
 };

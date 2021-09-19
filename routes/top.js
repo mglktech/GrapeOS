@@ -9,19 +9,44 @@ router.get("/welcome", (req, res) => {
 });
 router.get("/home", async (req, res) => {
 	let scs = [];
+	let fds = [];
 	if (req.isAuthenticated() && req.user.admin) {
 		// Collect apps from database belonging to Admin?
 		// collect apps based on JS object?
-		scs = await files.getShortcuts({ "data.requireAdmin": true });
+		scs = await files.getShortcuts({ "data.requireAdmin": true, "data.desktopVisible": true, });
+		fds = await files.getFolders({ "data.requireAdmin": true, "data.desktopVisible": true, });
 		//console.log(scs);
 	} else if (req.isAuthenticated()) {
 		scs = await shortcuts.getAllPublic();
 	} else {
-		scs = await files.getShortcuts({ "data.requireAuth": false });
+		scs = await files.getShortcuts({ "data.requireAuth": false, "data.desktopVisible": true, });
+		fds = await files.getFolders({ "data.requireAuth": false, "data.desktopVisible": true, });
 	}
 	
+	let finalArray = scs.concat(fds);
+	//console.log(finalArray);
+	res.render("desktops/new_default", { scs:finalArray});
+});
+
+router.get("/folder/:id", async(req, res) => {
+	const id = req.params.id;
+	const folderFile = await files.getFile({_id:id});
+	let resFiles = [];
+	for await(let file of folderFile.data.files) {
+		let FileID = file.toString();
+		let unpackedFile = await files.getShortcut({_id:FileID});
+		resFiles.push(unpackedFile);
+	}
+	//console.log(resFiles);
+	res.render("pages/folder", {scs:resFiles});
+})
+
+router.get("/home/public", async(req,res) => {
 	
-	res.render("desktops/new_default", { scs });
+	let scs = await files.getShortcuts({ "data.requireAuth": false, "data.desktopVisible": true, });
+	let fds = await files.getFolders({ "data.requireAuth": false, "data.desktopVisible": true, });
+	let finalArray = scs.concat(fds);
+	res.render("desktops/new_default", { scs:finalArray });
 });
 
 router.get("/about", (req, res) => {

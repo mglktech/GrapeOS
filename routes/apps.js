@@ -50,8 +50,6 @@ router.get(
 	})
 );
 
-router.get("/folder", (req, res) => {
-	res.render("apps/folder");
-});
+
 
 module.exports = router;

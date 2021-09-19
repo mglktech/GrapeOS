@@ -121,10 +121,17 @@ router.post(
 Shortcut Manager
 */
 router.get(
+	"/shortcuts/get/:id", isAdmin, use(async(req,res) => {
+		let file = await files.getShortcut({_id:req.params.id});
+		res.json(file);
+	})
+);
+
+router.get(
 	"/shortcuts/view",
 	isAdmin,
 	use(async (req, res) => {
-		let allShortcuts = await files.getShortcuts();
+		let allShortcuts = await files.getShortcuts({},false);
 		//console.log(allShortcuts);
 		res.render("bin/shortcut-manager/shortcut-view", {
 			shortcuts: allShortcuts,
@@ -150,6 +157,9 @@ router.post(
 			type:"shortcut",
 			data: {
 				icon: req.body.icon,
+				desktopVisible:cbtf(req.body.desktopVisible),
+				requireAuth:cbtf(req.body.requireAuth),
+				requireAdmin:cbtf(req.body.requireAdmin),
 				winbox: {
 					title: req.body["winbox.title"],
 					width: req.body["winbox.width"],
@@ -157,24 +167,77 @@ router.post(
 					url: req.body["winbox.url"],
 			},
 			}};
-		console.log(req.body.userType);
-		if(req.body.userType == "Public") {
-			new_file.data.requireAuth = false;
-			new_file.data.requireAdmin = false;
-		}
-		if(req.body.userType == "Private") {
-			new_file.data.requireAuth = true;
-			new_file.data.requireAdmin = false;
-		}
-		if(req.body.userType == "Admin") {
-			new_file.data.requireAuth = true;
-			new_file.data.requireAdmin = true;
-		}
 		console.log(new_file);
 		files.addShortcut(new_file);
 		res.redirect("/bin/shortcuts/view");
 	})
 	
 );
+router.get(
+	"/files/get/:id", isAdmin, use(async(req,res) => {
+		let file = await files.getFile({_id:req.params.id});
+		res.json(file);
+	})
+);
+router.post("/files/remove/:id", isAdmin, use((req,res)=>{
+	const _id = req.params.id;
+	files.findByIdAndRemove(_id).then((r) => {
+		res.redirect("/bin/shortcuts/view");
+	});
+	
+
+}));
+
+router.get(
+	"/folders/view",isAdmin,
+	use(async (req, res) => {
+		let allFolders = await files.getFolders({});
+		//console.log(allFolders);
+		res.render("bin/folder-manager/folders-view", {
+			folders: allFolders,
+		});
+	})
+);
+router.get(
+	"/folders/add",
+	isAdmin,
+	use(async (req, res) => {
+		res.render("bin/folder-manager/folders-add", {  });
+	})
+);
+router.post(
+	"/folders/add",
+	isAdmin,
+	use(async (req, res) => {
+		const filesStringArray = JSON.parse(req.body.files);
+		let fileIDS = [];
+		for(let string of filesStringArray) {
+			const properFile = await files.findOne({_id:string});
+			fileIDS.push(properFile._id);
+		}
+		let new_folder = {
+			name: req.body.name, // short name for selection
+			type:"folder",
+			data: {
+				desktopVisible:cbtf(req.body.desktopVisible),
+				requireAuth:cbtf(req.body.requireAuth),
+				requireAdmin:cbtf(req.body.requireAdmin),
+				files:fileIDS,
+			}};
+		console.log(new_folder);
+		files.addShortcut(new_folder);
+		res.redirect("/bin/folders/view");
+	})
+	
+);
+
+function cbtf(val) { // Checkbox True/False <-- because checkboxes return "on" if true...
+	if(val) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
 
 module.exports = router;

@@ -16,23 +16,17 @@ const model = mongoose.model(modelName, mySchema);
 model.setup = async () => {
 	let icons = default_icons();
 	for (let i = 0; i < icons.length; i++) {
-		const exists = await model.exists({
-			name: icons[i].name,
-			type: icons[i].type,
-		});
+		const exists = await model.exists(icons[i]);
 		if (!exists) {
 			await new model(icons[i]).save().then((res) => {
 				console.log(`Created new default icon: ${res.name}`);
 			});
 		}
 	}
-	let default_icon = await model.findOne({ name: "_default", type: "icon" });
+	let default_icon = await model.findOne({ name: "_file", type: "icon" });
 	let shortcuts = default_shortcuts(default_icon._id);
 	shortcuts.forEach(async (shortcut) => {
-		const exists = await model.exists({
-			name: shortcut.name,
-			type: shortcut.type,
-		});
+		const exists = await model.exists(shortcut);
 		if (!exists) {
 			let push = await new model(shortcut).save();
 			console.log(`Created new default shortcut: ${push.name}`);
@@ -52,11 +46,12 @@ const setupDefaultFolders = async () => {
 	});
 	let adminFolder = {
 		name: "Administrative Tools",
-		type: "Folder",
+		type: "folder",
 		data: {
 			icon:icon._id,
 			requireAuth:true,
 			requireAdmin:true,
+			desktopVisible: true,
 			files: [],
 		},
 	};
@@ -104,6 +99,14 @@ const default_icons = () => {
 				iconTypeData: "fa fa-folder-open",
 			},
 		},
+		{
+			name: "_file",
+			type: "icon",
+			data: {
+				iconType: "icon",
+				iconTypeData: "fa fa-file",
+			}
+		}
 	];
 };
 /*
@@ -135,6 +138,7 @@ const default_shortcuts = (default_icon = null) => {
 				icon: default_icon,
 				requireAuth: true,
 				requireAdmin: true,
+				desktopVisible: false,
 				winbox: {
 					title: "Task Scheduler",
 					width: "400",
@@ -151,6 +155,7 @@ const default_shortcuts = (default_icon = null) => {
 				icon: default_icon,
 				requireAuth: true,
 				requireAdmin: true,
+				desktopVisible: false,
 				winbox: {
 				title: "Icon Manager",
 				width: "400",
@@ -166,11 +171,28 @@ const default_shortcuts = (default_icon = null) => {
 				icon: default_icon,
 				requireAuth: true,
 				requireAdmin: true,
+				desktopVisible: false,
 				winbox: {
 				title: "Shortcut Manager",
 				width: "400",
 				height: "520",
 				url: "/bin/shortcuts/view",
+				},
+			},
+		},
+		{
+			name: "Folder Manager",
+			type: "shortcut",
+			data: {
+				icon: default_icon,
+				requireAuth: true,
+				requireAdmin: true,
+				desktopVisible: false,
+				winbox: {
+				title: "Folder Manager",
+				width: "400",
+				height: "520",
+				url: "/bin/folders/view",
 				},
 			},
 		},
@@ -181,10 +203,11 @@ const default_shortcuts = (default_icon = null) => {
 				icon: default_icon,
 				requireAuth: false,
 				requireAdmin: false,
+				desktopVisible: true,
 				winbox: {
 					title: "About Me",
-					width: "400",
-					height: "520",
+					width: "1024",
+					height: "768",
 					url: "/about",
 				}	
 				
@@ -195,7 +218,11 @@ const default_shortcuts = (default_icon = null) => {
 
 model.getFile = async (filter) => {
 	let file = await model.findOne(filter);
-	return file.toObject({ flattenMaps: true });
+	if(file) {
+		return file.toObject({ flattenMaps: true });
+	}
+	console.log(`getFile Error: No file found for filter: ${filter}`);
+	return null;
 };
 model.getFiles = async (filter) => {
 	let files = await model.find(filter);
@@ -204,6 +231,9 @@ model.getFiles = async (filter) => {
 		rtnArray.push(file.toObject({ flattenMaps: true }));
 	});
 	return rtnArray;
+};
+model.removeFile = (_id) => {
+	model.findByIdAndRemove(_id);
 };
 model.getShortcut = async (filter = {}) => {
 	Object.assign(filter, {type:"shortcut"});
@@ -218,12 +248,14 @@ model.getShortcuts = async (filter = {}) => {
 		// forEach loops don't like to behave asynchronously.
 		scs[i].icon = await model.getFile({ _id: scs[i].data.icon });
 	}
+	//console.log(scs);
 	return scs;
 };
 model.getFolder = async(filter) => {
 	Object.assign(filter, {type:"folder"});
 	let fd = await model.getFile(filter);
-	fd.icon = await model.getFile({ _id: fd.data.icon });
+	fd.icon = await model.getFile({ name: "_folder",
+	type: "icon", });
 	return fd;
 };
 model.getFolders = async (filter) => {
@@ -231,7 +263,8 @@ model.getFolders = async (filter) => {
 	let fds = await model.getFiles(filter);
 	for (let i = 0; i < fds.length; i++) {
 		// forEach loops don't like to behave asynchronously.
-		fds[i].icon = await model.getFile({ _id: fds[i].data.icon });
+		fds[i].icon = await model.getFile({ name: "_folder",
+		type: "icon", });
 	}
 	return fds;
 };

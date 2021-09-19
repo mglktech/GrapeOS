@@ -1,0 +1,50 @@
+<html lang="en">
+
+<%-include("../partials/head")%>
+
+<body>
+    <div class="card textlight bg-dark text-light min-vh-100">
+        
+        <div class="card-body">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                    <% scs.forEach(sc => {%>
+                    <div class="d-inline-flex flex-column align-items-center p-2" id="<%=sc._id%>" style="cursor: pointer;">
+                    <%if(sc.icon.data.iconType == "img") {%>
+                        <img class="img-fluid" width="50" src="<%=sc.icon.data.iconTypeData%>">
+                    <%}if(sc.icon.data.iconType == "icon"){%>
+                        <i class="<%=sc.icon.data.iconTypeData%>" style="font-size: 3rem"></i>
+                    <%}%>
+                        
+                        <span class="text-nowrap "><%=sc.name%></span>
+                    </div>
+                <%});%>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+    <script>
+        //console.log(<%-JSON.stringify(scs)%>);
+        <% scs.forEach(sc => {%>
+            document.getElementById("<%=sc._id%>").addEventListener("click", () => {
+                <% if(sc.type === "folder") {%>
+                window.parent._myFunc({ 
+                    title: '<%=sc.name%>', 
+                    width: '640', 
+                    height: '480', 
+                    url: '/folder/<%=sc._id%>' });
+            <%} if(sc.type === "shortcut") {%>
+            window.parent._myFunc(<%-JSON.stringify(sc.data.winbox)%>);
+            <%}%>
+        });
+        
+        <%})%>
+        
+    </script>
+</body>
+
+</html>
