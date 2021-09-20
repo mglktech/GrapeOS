@@ -14,8 +14,10 @@
         style="position: absolute;bottom: 50px;right: 15px;color: rgb(200,200,200,0.3);border: 1px solid rgb(200,200,200,0.3);">
         [ WARNING ]<br>Site still in development<br>Expect errors!</p>
     <div class="navbar-bottom"><img class="taskbar-start" src="/assets/img/Emoji.svg" alt="Grape Emoji" style="filter: brightness(95%) grayscale(100%);">
-        <div class="taskbar-right"><img id="spotify" src="/assets/img/akar-icons_spotify-fill.svg" style="cursor: pointer;" alt="Spotify"><img
-                src="/assets/img/vs_profile.svg" alt="Profile">
+        <div class="taskbar-right"><img class="px-2"id="spotify" src="/assets/img/akar-icons_spotify-fill.svg" style="cursor: pointer;" alt="Spotify">
+        <a href="<%=authRoute%>" class=" d-flex justify-content-center">
+        <img src="/assets/img/vs_profile.svg" alt="Profile">
+        </a>
             <div class="taskbar-timedate text-light"><span id="time"></span><span id="date"></span></div>
         </div>
     </div>

@@ -19,6 +19,7 @@ router.get(
 	use(async (req, res) => {
 		let sv_info = await db.getServerByVUrl(req.params.vUrlCode);
 		// deliver as Information window
+		res.render("pages/error", {referer: req.headers.referer,code:404, message:"We're still working on this page!"});
 	})
 );
 router.get(
@@ -26,6 +27,7 @@ router.get(
 	use(async (req, res) => {
 		let sv_info = await db.getServerByVUrl(req.params.vUrlCode);
 		// deliver as searchable content window
+		res.render("pages/error", {referer: req.headers.referer,code:404, message:"We're still working on this page!"});
 	})
 );
 

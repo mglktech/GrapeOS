@@ -44,7 +44,7 @@ header.masthead .bg-circle {
   z-index: 0;
   position: absolute;
   border-radius: 100%;
-  background: linear-gradient(180deg, var(--bs-purple), #261543);
+  background: linear-gradient(180deg, #4e2d89, #261543);
 }
 
 header.masthead .bg-circle-1 {

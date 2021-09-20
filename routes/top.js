@@ -10,13 +10,16 @@ router.get("/welcome", (req, res) => {
 router.get("/home", async (req, res) => {
 	let scs = [];
 	let fds = [];
+	let authRoute = "/auth/login";
 	if (req.isAuthenticated() && req.user.admin) {
 		// Collect apps from database belonging to Admin?
 		// collect apps based on JS object?
 		scs = await files.getShortcuts({ "data.requireAdmin": true, "data.desktopVisible": true, });
 		fds = await files.getFolders({ "data.requireAdmin": true, "data.desktopVisible": true, });
+		authRoute = "/auth/logout"
 		//console.log(scs);
 	} else if (req.isAuthenticated()) {
+		authRoute = "/auth/logout"
 		scs = await shortcuts.getAllPublic();
 	} else {
 		scs = await files.getShortcuts({ "data.requireAuth": false, "data.desktopVisible": true, });
@@ -25,7 +28,7 @@ router.get("/home", async (req, res) => {
 	
 	let finalArray = scs.concat(fds);
 	//console.log(finalArray);
-	res.render("desktops/new_default", { scs:finalArray});
+	res.render("desktops/new_default", { scs:finalArray, authRoute});
 });
 
 router.get("/folder/:id", async(req, res) => {
@@ -45,8 +48,9 @@ router.get("/home/public", async(req,res) => {
 	
 	let scs = await files.getShortcuts({ "data.requireAuth": false, "data.desktopVisible": true, });
 	let fds = await files.getFolders({ "data.requireAuth": false, "data.desktopVisible": true, });
+	let authRoute = "/auth/login";
 	let finalArray = scs.concat(fds);
-	res.render("desktops/new_default", { scs:finalArray });
+	res.render("desktops/new_default", { scs:finalArray, authRoute });
 });
 
 router.get("/about", (req, res) => {
