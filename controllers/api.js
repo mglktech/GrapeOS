@@ -180,7 +180,7 @@ const getServerInfo = async (ip) => {
 	// data.vars = vars;
 };
 const fivem_cron_get = async (serverId) => {
-	const sv = await serverModel.findOne({serverId});
+	const sv = await serverModel.findOne({_id:serverId});
 	if(!sv) {
 		console.log(`[server-model] Fatal Error: _id provided does not match server in database: ${serverId}`);
 		return;
