@@ -10,7 +10,7 @@ router.get("/welcome", (req, res) => {
 router.get("/home", async (req, res) => {
 	let scs = [];
 	let fds = [];
-	let authRoute = "/auth/login";
+	let authRoute = "/auth/discord";
 	if (req.isAuthenticated() && req.user.admin) {
 		// Collect apps from database belonging to Admin?
 		// collect apps based on JS object?
@@ -48,12 +48,16 @@ router.get("/home/public", async(req,res) => {
 	
 	let scs = await files.getShortcuts({ "data.requireAuth": false, "data.desktopVisible": true, });
 	let fds = await files.getFolders({ "data.requireAuth": false, "data.desktopVisible": true, });
-	let authRoute = "/auth/login";
+	let authRoute = "/auth/discord";
 	let finalArray = scs.concat(fds);
+	
 	res.render("desktops/new_default", { scs:finalArray, authRoute });
 });
 
 router.get("/about", (req, res) => {
 	res.render("pages/about");
 });
+
+
+
 module.exports = router;

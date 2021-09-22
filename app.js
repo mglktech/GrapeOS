@@ -23,7 +23,7 @@ const binRoutes = require("./routes/bin");
 require("ejs");
 require("dotenv").config();
 require("./config/db");
-require("./config/strategies/localStrategy");
+require("./config/strategies/discordStrategy");
 require("./config/api/discord.js");
 require("./bin/highlife-dragtimes");
 require("./config/cron.js");
@@ -44,7 +44,7 @@ const sessionStore = MongoStore.create({
 
 app.use(
 	session({
-		secret: process.env.session_secret,
+		secret: "Some Random Secret",
 		resave: false,
 		saveUninitialized: false,
 		store: sessionStore,
@@ -67,7 +67,7 @@ app.use("/apps", appsRoutes);
 app.use("/auth", authRoutes);
 app.use("/api", apiRoutes);
 //app.use("/articles", articleRoutes);
-app.use("/bin", binRoutes);
+app.use("/bin", require("./routes/bin"));
 //app.use("/protected", protectedRoutes);
 //app.use("/projects", projectRoutes);
 //app.use("/demos", demoRoutes);

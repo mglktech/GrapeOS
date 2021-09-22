@@ -6,6 +6,7 @@ const isAdmin = require("../config/auth").isAdmin;
 const use = (fn) => (req, res, next) => {
 	Promise.resolve(fn(req, res, next)).catch(next);
 };
+router.use("/discord", require("./auth/discord"));
 router.get("/login", use(controller.login_get));
 router.get(
 	"/create",

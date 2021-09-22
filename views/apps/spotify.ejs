@@ -27,7 +27,7 @@ const trackArt = document.querySelector("#trackart");
 const trackTitle = document.querySelector("#tracktitle");
 const trackArtist = document.querySelector("#trackartist");
 const getSetTrack = async () => {
-  let trackData = await fetch('/api/lastfm').then(res => res.json());
+  let trackData = await fetch('/apps/spotify/data').then(res => res.json());
   //let dataAsJson = await trackData.json();
   //console.log(trackData);
   trackArt.src=trackData.image[3]["#text"];

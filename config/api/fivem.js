@@ -10,6 +10,34 @@ class Server {
 		this.ip = ip;
 		this.options = Object.assign(DEFAULT_OPTIONS, options);
 	}
+	getPlayers() {
+		return new Promise((send, err) => {
+			axios
+				.get(`http://${this.ip}/players.json`, {
+					timeout: this.options.timeout,
+				})
+				.then(function (body) {
+					let players = body.data;
+					send(players);
+				})
+				.catch(function (error) {
+					err(error);
+				});
+		});
+	}
+	getInfo() {
+		return new Promise((send, err) => {
+			axios
+				.get(`http://${this.ip}/info.json`, { timeout: this.options.timeout })
+				.then(function (body) {
+					let info = body.data;
+					send(info);
+				})
+				.catch(function (error) {
+					err(error);
+				});
+		});
+	}
 	getPlayersAll() {
 		return new Promise((send, err) => {
 			axios

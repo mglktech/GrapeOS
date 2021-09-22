@@ -80,7 +80,7 @@ client.fetchRole = async (guildID, role_id) => {
 };
 
 client.fetchRoles = async (guild_id) => {
-	const guild = await DiscordClient.guilds.fetch(guild_id);
+	const guild = await client.guilds.fetch(guild_id);
 	return guild.roles.fetch("", false, true).then((roleManager) => {
 		let c = 10;
 		let roles = [];
