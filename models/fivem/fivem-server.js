@@ -5,77 +5,76 @@
 // Be able to check almost-live up to date information on each player on the server and their associated roles.
 
 const mongoose = require("mongoose");
-
 const Schema = mongoose.Schema;
-
-const modelName = "Server"; // Singular, not sure if capitals are relevant
-// make schema, defines structure
+const modelName = "fivem-server";
 
 const mySchema = new Schema({
-	fiveM: {
-		ips: [String],
-		resources: [String],
-		enhancedHostSupport: Boolean,
-		icon: String,
-		server: String,
-		vars: {
-			type: Map,
-			of: String,
-		},
-		online: Boolean,
-		retries:Number,
+	ip: String,
+	resources: [String],
+	enhancedHostSupport: Boolean,
+	icon: String,
+	server: String,
+	vars: {
+		type: Map,
+		of: Object,
 	},
-	discord: {
-		id: String,
-		name: String,
-		icon: String,
-		splash: String,
-		discoverySplash: String,
-		region: String,
-		memberCount: Number,
-		large: Boolean,
-		deleted: Boolean,
-		features: Array,
-		vanityUrlCode: String,
-		description: String,
-		banner: String,
-		ownerID: String,
-		roles: [
-			{
-				id: String,
-				name: String,
-				color: Number,
-				hoist: Boolean,
-				rawPosition: Number,
-				managed: Boolean,
-				mentionable: Boolean,
-				deleted: Boolean,
-			},
-		],
-	},
+	online: Boolean,
+	retries:Number,
 });
 
 // create model based on schema
 const model = mongoose.model(modelName, mySchema);
 
-model.setOnline = async (_id, online) => {
-	const sv = await model.findOne({_id});
-	if(!sv) {
-		console.log(`[server-model] Fatal Error: _id provided does not match server in database: ${_id}`);
+model.fetchAll = () => {
+	return objectify(model.find());
+}
+
+model.fetchById = (id) => {
+	//console.log("new method");
+	return objectify(model.findById(id));
+};
+model.fetchByIP = (ip) => {
+	return objectify(model.findOne({ ip }));
+};
+
+model.create = (item) => {
+	return new model(item).save()
+	.then(res => {
+		doLog("fivem-server", `New Model Created. ${res._id}`);
+		return res;
+	})
+}
+model.modify = (id,contents) => {
+	model.findByIdAndUpdate(id,contents);
+}
+
+model.setStatus = (sv, status) => { // sv = found server model, status = Online Status (bool)
+	let retries = sv.retries;
+	if(!status) {
+		retries++;
+		let name = sv.vars.sv_projectName || sv._id;
+		console.log(`[fivem-server] -> ${name} has failed to respond after ${retries} retries.`);
+	}
+	else {
+		retries = 0;
+	}
+	model.findByIdAndUpdate(sv._id, {status, retries}).exec();
+}
+
+
+function objectify(item) {
+	try {
+		item.toObject({flattenMaps:true});
+	}
+	catch {
 		return;
 	}
-	model.findByIdAndUpdate(_id, { "fiveM.online": online }).exec();
-};
+}
 
-model.getById = async (id) => {
-	//console.log("new method");
-	return model.findById(id);
-};
-model.getByVanityUrlCode = (urlCode) => {
-	return model.findOne({ "discord.vanityUrlCode": urlCode });
-};
-model.getOne = (scope) => {};
-
+function doLog(service,text) {
+	let logTxt = `[${service}] -> ${text}`;
+	console.log(logTxt);
+}
 module.exports = model;
 
 // const myOldSchema = new Schema(

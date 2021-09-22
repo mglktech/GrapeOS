@@ -161,7 +161,6 @@ const fiveM_getServerPlayerInfo = async (ips) => {
 		}
 		logger.error(`Could not retrieve player info for ${ip}`);
 	}
-
 	return null; // Returns null if no player info can be found at all IPs;
 };
 
@@ -181,6 +180,11 @@ const getServerInfo = async (ip) => {
 	// data.vars = vars;
 };
 const fivem_cron_get = async (serverId) => {
+	const sv = await serverModel.findOne({serverId});
+	if(!sv) {
+		console.log(`[server-model] Fatal Error: _id provided does not match server in database: ${serverId}`);
+		return;
+	}
 	const server = await database.getServer(serverId);
 	if (!server) {
 		logger.warn("Error: No such server");

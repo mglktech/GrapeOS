@@ -24,21 +24,7 @@
     <div class="container-fluid text-light">
         <div class="row">
             <div class="col-4">
-                <div class="d-inline-flex flex-column align-items-center" id=""></div>
-                <% scs.forEach(sc => {%>
-                    <div class="d-inline-flex flex-column align-items-center p-2" id="<%=sc._id%>" style="cursor: pointer;">
-                    <%if(sc.icon.data.iconType == "img") {%>
-                        <img class="img-fluid" width="50" src="<%=sc.icon.data.iconTypeData%>">
-                    <%}if(sc.icon.data.iconType == "icon"){%>
-                        <i class="<%=sc.icon.data.iconTypeData%>" style="font-size: 3rem"></i>
-                    <%}%>
-                        
-                        <span class="text-nowrap "><%=sc.name%></span>
-                    </div>
-                <%});%>
-                
-                
-                
+                <div class="d-inline-flex flex-column align-items-center" id="iconWrapper"></div>
             </div>
         </div>
     </div>
@@ -46,9 +32,9 @@
     <script src="/js/winbox.bundle.js"></script>
     <script src="/js/clock.js"></script>
     <script src="/js/spotify.js"></script>
+    <script src="/js/iconCreator.js"></script>
     <script>
-        
-
+        const wrapper = document.getElementById("iconWrapper");
         
         function _myFunc(opts) {
             console.log("Creating Winbox with the following config:")
@@ -74,6 +60,7 @@
             return new WinBox(allOpts);
         };
         <% scs.forEach(sc => {%>
+            icon(<%-JSON.stringify(sc)%>, wrapper);
             document.getElementById("<%=sc._id%>").addEventListener("click", () => {
                 <% if(sc.type === "folder") {%>
                 const box = winBox({ 

@@ -4,9 +4,7 @@ const model = require("../models/hl-dragtime-model");
 const logger = require("emberdyn-logger");
 const text_live_dragtimes = "858368582759743518";
 
-client.on("ready", async () => {
-	logger.info("[HL_DRAGTIME]: Syncing Highlife Drag Times...");
-	const channel = await client.channels.fetch(text_live_dragtimes);
+async function SynchronizeAllMessages(channel) {
 	const allMessages = await fetchAll.messages(channel, {
 		reverseArray: true, // Reverse the returned array
 		userOnly: false, // Only return messages by users
@@ -15,16 +13,24 @@ client.on("ready", async () => {
 	});
 	for (message of allMessages) {
 		const dragTime = parseMessage(message);
-		let res = await model.findOneAndUpdate(dragTime, dragTime, {
-			upsert: true,
-		});
-		if (res == null) {
+		new model(dragTime).save()
+		.then(result => {
 			logger.info(
 				"[HL_DRAGTIME]: Sync : New Drag Time logged for " + dragTime.rp_name
 			);
-		}
+		});
 		//console.log(dragTime);
 		//console.log(ar);
+	}
+}
+
+client.on("ready", async () => {
+	logger.info("[HL_DRAGTIME]: Syncing Highlife Drag Times...");
+	const channel = await client.channels.fetch(text_live_dragtimes);
+	//console.log(channel);
+	// Synchronization Check can be done using channel.lastMessageID
+	if(!await model.exists({messageID:channel.lastMessageID})) {
+		await SynchronizeAllMessages(channel);
 	}
 	logger.info("[HL_DRAGTIME]: Sync Complete.");
 });
@@ -45,6 +51,7 @@ client.on("message", (message) => {
 });
 
 const parseMessage = (message) => {
+	let messageID = message.id;
 	let m = message.content;
 	let ts = message.createdTimestamp;
 	let ar = m.split(" "); // First, split into strings with no spaces and iterate through looking for patterns
@@ -62,6 +69,7 @@ const parseMessage = (message) => {
 		ar.length - 1,
 	];
 	let dragTime = {
+		messageID,
 		timestamp: ts,
 		rp_name: name,
 		vehicle,

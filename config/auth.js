@@ -10,7 +10,7 @@ module.exports.isAuth = async (req, res, next) => {
 	res.redirect("/auth/login");
 };
 module.exports.isAdmin = async (req, res, next) => {
-	if (req.isAuthenticated() && req.user.admin) {
+	if (req.isAuthenticated() && isAdmin(req.user)) {
 		next();
 		return;
 	}
@@ -20,3 +20,8 @@ module.exports.isAdmin = async (req, res, next) => {
 			"You are not authorised to view this content. (you are not an admin)"
 		);
 };
+const isAdmin = (user) => {
+	const AdminRoleID = process.env.GrapeOSSuperUserRoleID;
+	//console.log(user);
+	return true;
+}

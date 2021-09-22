@@ -13,41 +13,52 @@ const mySchema = new Schema({
 const model = mongoose.model(modelName, mySchema);
 ///funcs///
 
-model.setup = async () => {
-	let icons = default_icons();
-	for (let i = 0; i < icons.length; i++) {
-		const exists = await model.exists(icons[i]);
-		if (!exists) {
-			await new model(icons[i]).save().then((res) => {
-				console.log(`Created new default icon: ${res.name}`);
+const removeDefaultDuplicates = async (items) => {
+	//console.log(items);
+	for(let item of items) {
+		let exists = await model.exists(item);
+		if(!exists) {
+			console.log("[file-modal] -> Source code has changed for Default files. Clearing old files...")
+			let oldModels = await model.deleteMany({
+				name:item.name,
+				type:item.type,
+			});
+			await new model(item).save().then((res) => {
+				console.log(`Created new default ${res.type}: ${res.name}`);
 			});
 		}
 	}
+}
+
+model.setup = async () => {
+	let icons = await default_icons();
+	await removeDefaultDuplicates(icons);
 	let default_icon = await model.findOne({ name: "_file", type: "icon" });
-	let shortcuts = default_shortcuts(default_icon._id);
-	shortcuts.forEach(async (shortcut) => {
-		const exists = await model.exists(shortcut);
-		if (!exists) {
-			let push = await new model(shortcut).save();
-			console.log(`Created new default shortcut: ${push.name}`);
-			//console.log(push);
-		}
+	let shortcuts = await default_shortcuts(default_icon._id);
+	await removeDefaultDuplicates(shortcuts);
+	const adminFiles = await model.find({
+		type: "shortcut",
+		"data.requireAdmin": true,
 	});
-	setupDefaultFolders();
+	const folder_icon = await model.findOne({ name: "_folder", type: "icon" });
+	let adminFolder = await default_folders(folder_icon._id);
+	for(let file of adminFiles) {
+		adminFolder[0].data.files.push(file._id);
+	}
+	
+	await removeDefaultDuplicates(adminFolder);
 };
 
 
 /// Setup Folders///
 const setupDefaultFolders = async () => {
-	const icon = await model.findOne({ name: "_folder", type: "icon" });
-	const adminFiles = await model.find({
-		type: "shortcut",
-		"data.requireAdmin": true,
-	});
+	
+	
 	let adminFolder = {
 		name: "Administrative Tools",
 		type: "folder",
 		data: {
+			group:"default",
 			icon:icon._id,
 			requireAuth:true,
 			requireAdmin:true,
@@ -81,49 +92,9 @@ files: [String], <-- ObjectIDs of each file contined within the folder
     iconTypeData:String, <-- Type Data, can be Icon Class or Image src.
 }
 */
-const default_icons = () => {
-	return [
-		{
-			name: "_default",
-			type: "icon",
-			data: {
-				iconType: "icon",
-				iconTypeData: "fa fa-user",
-			},
-		},
-		{
-			name: "_folder",
-			type: "icon",
-			data: {
-				iconType: "icon",
-				iconTypeData: "fa fa-folder-open",
-			},
-		},
-		{
-			name: "_file",
-			type: "icon",
-			data: {
-				iconType: "icon",
-				iconTypeData: "fa fa-file",
-			}
-		}
-	];
-};
-/*
-Shortcut Data Model:
-{
-    icon: ObjectId,
-    requireAuth: Boolean, <-- Does this shortcut require the user to be logged in to view?
-    requireAdmin: Boolean, <-- Does this shortcut require the user to be a site administrator to view?
-    winbox:{
-        title:String,
-        width:String, <-- \\ 
-        height:String, <--\\\\ Strings instead of integers so I can use relative terms like viewer height/width
-        url:String, <-- Each winbox is an iframe of another part of the site.
-    }
-}
-*/
-const default_shortcuts = (default_icon = null) => {
+
+const default_shortcuts = async (default_icon = null) => {
+	let wrench_icon = await model.findOne({ name: "_wrench", type: "icon" });
 	if (!default_icon) {
 		console.log(
 			"[CRITICAL ERROR]: setupShortcuts was not provided a default_icon!"
@@ -135,7 +106,8 @@ const default_shortcuts = (default_icon = null) => {
 			name: "Task Scheduler",
 			type: "shortcut",
 			data: {
-				icon: default_icon,
+				group:"Admin",
+				icon: wrench_icon,
 				requireAuth: true,
 				requireAdmin: true,
 				desktopVisible: false,
@@ -152,7 +124,8 @@ const default_shortcuts = (default_icon = null) => {
 			name: "Icon Manager",
 			type: "shortcut",
 			data: {
-				icon: default_icon,
+				group:"Admin",
+				icon: wrench_icon,
 				requireAuth: true,
 				requireAdmin: true,
 				desktopVisible: false,
@@ -168,7 +141,8 @@ const default_shortcuts = (default_icon = null) => {
 			name: "Shortcut Manager",
 			type: "shortcut",
 			data: {
-				icon: default_icon,
+				group:"Admin",
+				icon: wrench_icon,
 				requireAuth: true,
 				requireAdmin: true,
 				desktopVisible: false,
@@ -184,7 +158,8 @@ const default_shortcuts = (default_icon = null) => {
 			name: "Folder Manager",
 			type: "shortcut",
 			data: {
-				icon: default_icon,
+				group:"Admin",
+				icon: wrench_icon,
 				requireAuth: true,
 				requireAdmin: true,
 				desktopVisible: false,
@@ -200,6 +175,7 @@ const default_shortcuts = (default_icon = null) => {
 			name: "About",
 			type: "shortcut",
 			data: {
+				group:"default",
 				icon: default_icon,
 				requireAuth: false,
 				requireAdmin: false,
@@ -215,6 +191,82 @@ const default_shortcuts = (default_icon = null) => {
 		},
 	];
 };
+
+const default_folders = (default_icon = null) => {
+	if (!default_icon) {
+		console.log(
+			"[CRITICAL ERROR]: setupShortcuts was not provided a default_icon!"
+		);
+		return null;
+	}
+return [
+	{name: "Admin Tools",
+type: "folder",
+data: {
+	group:"Admin",
+	icon:default_icon,
+	requireAuth:true,
+	requireAdmin:true,
+	desktopVisible: true,
+	files: [],
+},},];
+	
+}
+const default_icons = () => {
+	return [
+		{
+			name: "_default",
+			type: "icon",
+			data: {
+				group:"default",
+				iconType: "icon",
+				iconTypeData: "fa fa-user",
+			},
+		},
+		{
+			name: "_folder",
+			type: "icon",
+			data: {
+				group:"default",
+				iconType: "icon",
+				iconTypeData: "fa fa-folder-open",
+			},
+		},
+		{
+			name: "_file",
+			type: "icon",
+			data: {
+				group:"default",
+				iconType: "icon",
+				iconTypeData: "fa fa-file",
+			}
+		},
+		{
+			name: "_wrench",
+			type: "icon",
+			data: {
+				group:"default",
+				iconType: "icon",
+				iconTypeData: "fa fa-wrench",
+			}
+		},
+	];
+};
+/*
+Shortcut Data Model:
+{
+    icon: ObjectId,
+    requireAuth: Boolean, <-- Does this shortcut require the user to be logged in to view?
+    requireAdmin: Boolean, <-- Does this shortcut require the user to be a site administrator to view?
+    winbox:{
+        title:String,
+        width:String, <-- \\ 
+        height:String, <--\\\\ Strings instead of integers so I can use relative terms like viewer height/width
+        url:String, <-- Each winbox is an iframe of another part of the site.
+    }
+}
+*/
+
 
 model.getFile = async (filter) => {
 	let file = await model.findOne(filter);
