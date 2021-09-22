@@ -173,7 +173,7 @@ const getServerInfo = async (ip) => {
 
 		return data;
 	} catch (err) {
-		logger.warn(`fiveM Api::getServerinfo:: ${err}`);
+		logger.warn(`fiveM Api::getServerinfo:: ${err}`); 
 		return null;
 	}
 	// let vars = new Map(Object.entries(data.vars));
