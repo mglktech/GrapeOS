@@ -7,27 +7,14 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const passport = require("passport");
 const logger = require("emberdyn-logger");
-const topRoutes = require("./routes/top");
-//const accountRoutes = require("./routes/account");
-const appsRoutes = require("./routes/apps");
-const authRoutes = require("./routes/auth");
-const apiRoutes = require("./routes/api");
-//const articleRoutes = require("./routes/articles");
-const binRoutes = require("./routes/bin");
-//const publicRoutes = require("./routes/public");
-//const protectedRoutes = require("./routes/protected");
-
-//const projectRoutes = require("./routes/projects");
-//const demoRoutes = require("./routes/demos");
 
 require("ejs");
 require("dotenv").config();
 require("./config/db");
 require("./config/strategies/discordStrategy");
-require("./config/api/discord.js");
+require("./services/discord");
 require("./bin/highlife-dragtimes");
 require("./config/cron.js");
-
 require("./config/newdbconfig").setup();
 let app = express();
 
@@ -49,7 +36,7 @@ app.use(
 		saveUninitialized: false,
 		store: sessionStore,
 		cookie: {
-			maxAge: 1000 * 60 * 60 * 24, // Equals 1 day (1 day * 24 hr/1 day * 60 min/1 hr * 60 sec/1 min * 1000 ms / 1 sec)
+			maxAge: 1000 * 60 * 60 * 2, // Equals 2 Hours
 		},
 	})
 );
@@ -59,19 +46,17 @@ app.use(passport.session());
 app.use(express.urlencoded({ extended: true })); // EXTENDED URLENCODING FOR FORMS
 
 // Index Routing
-app.use("/", topRoutes);
-
-//app.use("/public", publicRoutes);
-//app.use("/account", accountRoutes);
-app.use("/apps", appsRoutes);
-app.use("/auth", authRoutes);
-app.use("/api", apiRoutes);
-//app.use("/articles", articleRoutes);
+app.use("/", require("./routes/top"));
+//app.use("/public", require("./routes/public"));
+//app.use("/account", require("./routes/account"));
+app.use("/apps", require("./routes/apps"));
+app.use("/auth", require("./routes/auth"));
+app.use("/api", require("./routes/api"));
+//app.use("/articles", require("./routes/articles"));
 app.use("/bin", require("./routes/bin"));
-//app.use("/protected", protectedRoutes);
-//app.use("/projects", projectRoutes);
-//app.use("/demos", demoRoutes);
-
+//app.use("/protected", require("./routes/protected"));
+//app.use("/projects", require("./routes/projects"));
+//app.use("/demos", require("./routes/demos"));
 app.use((err, req, res, next) => {
 	// must manually set 404 status code
 	//res.status(404).sendFile(`${path}404.html`, { root });

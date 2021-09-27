@@ -77,3 +77,11 @@
 .wb-full {
 	display: none;
 }
+.wb-n,
+.wb-s {
+	height: 20px;
+}
+.wb-e,
+.wb-w {
+	width: 20px;
+}

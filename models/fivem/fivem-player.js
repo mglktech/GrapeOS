@@ -2,44 +2,28 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const modelName = "Player"; // Singular, not sure if capitals are relevant
+const modelName = "fivem-player"; // Singular, not sure if capitals are relevant
 // make schema, defines structure
 
 const mySchema = new Schema({
-	fiveM: {
-		identifiers: { type: Map, of: String },
-		name: String,
-		server: { type: Schema.Types.ObjectId, ref: "Server" },
-	},
-	discord: {
-		user: {
-			id: String,
-			username: String,
-			descriminator: String,
-			avatar: String,
-		},
-		nickname: String,
-		roles: [{ type: Schema.Types.ObjectId, ref: "Role" }],
-		deleted: Boolean,
-		joined: Number,
-		_dateUpdated: Number,
-	},
+	identifiers: { type: Map, of: String },
+	name: String,
+	server: { type: Schema.Types.ObjectId, ref: "fivem-server" },
+	online: Boolean,
 });
-
-const myOldSchema = new Schema(
-	{
-		identifiers: {
-			type: Map,
-			of: String,
-		},
-		identifiersArray: [String],
-		name: String,
-		aliases: [String],
-	},
-	{ timestamps: true }
-);
-
 // create model based on schema
 const model = mongoose.model(modelName, mySchema);
+
+// assign model constants
+model.create = () => {};
+model.findPlayer = async (playerInfo) => {
+	// find player that matches one of the identifiers
+	const steamID = Object.fromEntries(playerInfo.identifiers).steam;
+	//console.log(discordID);
+	return model.findOneAndUpdate(playerInfo, playerInfo, {
+		new: true,
+		upsert: true,
+	});
+};
 
 module.exports = model;

@@ -10,6 +10,10 @@ const activityModel = require("../models/activity-model");
 const playerModel = require("../models/player-model");
 const roleModel = require("../models/role-model");
 
+const FiveMServerModel = require("../models/fivem/fivem-server");
+const FiveMPlayerModel = require("../models/fivem/fivem-player");
+const FiveMActivityModel = require("../models/fivem/fivem-activity");
+
 const Moment = require("moment");
 require("dotenv").config();
 /* 
@@ -155,11 +159,14 @@ const fiveM_getServerPlayerInfo = async (ips) => {
 	for (let ip of ips) {
 		// Has to be a low-level for loop in order to break out properly;
 		const serverInfo = await getServerInfo(ip);
-		const playerInfo = await getPlayers(ip);
-		if (playerInfo) {
-			return { serverInfo, playerInfo };
+		if (!serverInfo) {
+			return null;
 		}
-		logger.error(`Could not retrieve player info for ${ip}`);
+		const playerInfo = await getPlayers(ip);
+		if (!playerInfo) {
+			return null;
+		}
+		return { serverInfo, playerInfo };
 	}
 	return null; // Returns null if no player info can be found at all IPs;
 };
@@ -173,16 +180,115 @@ const getServerInfo = async (ip) => {
 
 		return data;
 	} catch (err) {
-		logger.warn(`fiveM Api::getServerinfo:: ${err}`); 
+		logger.warn(`fiveM Api::getServerinfo:: ${err}`);
 		return null;
 	}
 	// let vars = new Map(Object.entries(data.vars));
 	// data.vars = vars;
 };
+const fivem_cron_get_imp = async (serverId) => {
+	const FiveMService = require("../services/fiveM");
+	const FiveMServer = await FiveMServerModel.getById(serverId);
+	if (!FiveMServer) {
+		console.log(`Error: No Server found for _id:${serverId}`);
+		return;
+	}
+	const srv = new FiveMService.Server(FiveMServer.ip);
+	const serverInfo = await srv.getInfo().catch((err) => {
+		console.log(
+			`Error: No Server Info recieved for ${FiveMServer.ip} [${err.code}]`
+		);
+		return;
+	});
+	if (!serverInfo) {
+		return;
+	}
+	//console.log(serverInfo);
+	syncServerInfo(FiveMServer, serverInfo);
+	const playerInfo = await srv.getPlayers();
+	const players = await syncPlayerInfo(playerInfo);
+	//console.log(players);
+	for (let player of players) {
+		// activity sync
+		let dbActivity = await FiveMActivityModel.findOne({
+			player: player.playerModel._id,
+			online: true,
+		});
+		if (!dbActivity) {
+			FiveMActivityModel.create({
+				server: FiveMServer._id,
+				player: player.playerModel._id,
+				sv_id: player.sv_id,
+			});
+			console.log(
+				`${player.playerModel.name} has logged into ${FiveMServer.ip}`
+			);
+		} else if (dbActivity.sv_id != player.sv_id) {
+			// Server id Mismatch on player, put them offline.(they will come online with new sv_id next cycle)
+			FiveMActivityModel.finish(dbActivity._id);
+		}
+		// Move onto next player
+	}
+	const dbActivities = await FiveMActivityModel.find({
+		server: FiveMServer._id,
+		online: true,
+	}).populate("player");
+	//console.log(dbActivities);
+	for (let activity of dbActivities) {
+		const found = players.find((player) => player.sv_id === activity.sv_id);
+		if (!found) {
+			FiveMActivityModel.finish(activity._id);
+		}
+	}
+	// syncServerInfo(server, fiveM_server.serverInfo);
+
+	// //const hl_jobs = hl_getJobs(fiveM_server.serverInfo.vars);
+	// await syncActivity(server._id, players);
+	// await findDiscords(players, server._id);
+	// await syncDiscordRoles(server);
+	// return;
+};
+
+async function syncServerInfo(FiveMServer, serverInfo) {
+	return FiveMServerModel.findByIdAndUpdate(
+		FiveMServer._id,
+		{ vars: serverInfo.vars },
+		{
+			new: true,
+			upsert: true,
+		}
+	).exec();
+}
+
+async function syncPlayerInfo(playerInfo) {
+	let players = [];
+	for (let player of playerInfo) {
+		const p = createPlayer(player);
+		let playerModel = await FiveMPlayerModel.findPlayer(p);
+		players.push({ playerModel, sv_id: player.id });
+	}
+	return players;
+}
+const createPlayer = (playerInfo) => {
+	const identifiers = MapIdentifiers(playerInfo.identifiers);
+	return { identifiers, name: playerInfo.name };
+};
+
+const MapIdentifiers = (identifiers) => {
+	let map = [];
+	identifiers.forEach((id) => {
+		const split = id.split(":");
+		map.push(split);
+	});
+	return new Map(map);
+};
+
 const fivem_cron_get = async (serverId) => {
-	const sv = await serverModel.findOne({_id:serverId});
-	if(!sv) {
-		console.log(`[server-model] Fatal Error: _id provided does not match server in database: ${serverId}`);
+	const sv = await serverModel.findOne({ _id: serverId });
+	if (!sv) {
+		console.log(
+			`[server-model] Fatal Error: _id provided does not match server in database: ${serverId}`
+		);
 		return;
 	}
 	const server = await database.getServer(serverId);
@@ -245,12 +351,7 @@ async function syncActivity(server, players) {
 		//console.log(player);
 		const match = await activities.some((record) => {
 			// check to see whether player ID matches with this record
-			// console.log(
-			// 	`${record.player.toString()} ::: ${player.playerModel._id.toString()}`
-			// );
 			if (record.player.toString() === player.playerModel._id.toString()) {
-				//console.log(player);
-
 				if (record.sv_id !== player.sv_id) {
 					database.FinishActivity(record._id);
 					logger.info(
@@ -283,26 +384,9 @@ This may be because the client has re-connected to the server.`
 	//console.log(activity);
 }
 
-async function syncPlayerInfo(server, playerInfo) {
-	let players = [];
-	for (let player of playerInfo) {
-		const p = createPlayer(server._id, player);
-		let playerModel = await database.findPlayer(p);
-		players.push({ playerModel, sv_id: player.id });
-	}
-	return players;
-}
-
 function hl_getJobs(vars) {
 	vars = Object.fromEntries(vars);
 	return JSON.parse(vars["hl_onlinejobs"]);
-}
-
-function syncServerInfo(srv, serverInfo) {
-	const fiveM = new Map(Object.entries(serverInfo));
-	let serverObj = { fiveM };
-	serverModel.setOnline(srv._id, true);
-	database.syncServer(srv, serverObj);
 }
 
 const findDiscords = async (players, id_server) => {
@@ -352,11 +436,6 @@ const syncDiscordRoles = async (server) => {
 		let updatedRole = await database.updateRole(role._id, discordData);
 		console.log(`New Role Discovered: ${discordData.name}`);
 	}
-};
-
-const createPlayer = (serverId, playerInfo) => {
-	const identifiers = MapIdentifiers(playerInfo.identifiers);
-	return { identifiers, name: playerInfo.name, server: serverId };
 };
 
 const getPlayers = (ip) => {
@@ -428,21 +507,12 @@ const findServerInfo = async (ip) => {
 	// data.vars = vars;
 };
 
-const MapIdentifiers = (identifiers) => {
-	let map = [];
-
-	identifiers.forEach((id) => {
-		const split = id.split(":");
-		map.push(split);
-	});
-	return new Map(map);
-};
-
 module.exports = {
 	addServer,
 	fivem_get,
 	db_onlinePlayers_get,
 	fivem_cron_get,
+	fivem_cron_get_imp,
 	getUserTracks,
 	getOnlinePlayerInfo,
 	getOnlineServerInfo,

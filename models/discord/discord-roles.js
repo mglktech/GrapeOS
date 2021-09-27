@@ -8,13 +8,13 @@ const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const modelName = "Role"; // Singular, not sure if capitals are relevant
+const modelName = "discord-role"; // Singular, not sure if capitals are relevant
 // make schema, defines structure
 const mySchema = new Schema(
 	{
-		server: {
+		guild: {
 			type: Schema.Types.ObjectId,
-			ref: "Server",
+			ref: "discord-guild",
 		},
 		role_id: String,
 		name: String,

@@ -10,6 +10,23 @@ class Server {
 		this.ip = ip;
 		this.options = Object.assign(DEFAULT_OPTIONS, options);
 	}
+	getCfx() {
+		return new Promise((send, err) => {
+			axios
+				.get(
+					`https://servers-frontend.fivem.net/api/servers/single/${this.ip}`,
+					{
+						timeout: this.options.timeout,
+					}
+				)
+				.then(function (body) {
+					send(body.data);
+				})
+				.catch(function (error) {
+					err(error);
+				});
+		});
+	}
 	getPlayers() {
 		return new Promise((send, err) => {
 			axios
@@ -31,6 +48,7 @@ class Server {
 				.get(`http://${this.ip}/info.json`, { timeout: this.options.timeout })
 				.then(function (body) {
 					let info = body.data;
+					info.icon = "";
 					send(info);
 				})
 				.catch(function (error) {

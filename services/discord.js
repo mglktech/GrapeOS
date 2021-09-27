@@ -1,4 +1,6 @@
 const Discord = require("discord.js");
+const fs = require("fs");
+
 const client = new Discord.Client({
 	_tokenType: "",
 	intents: "GUILD_MESSAGES",
@@ -27,7 +29,7 @@ client.fetchGuild = (guildID) => {
 				ownerid: guild.ownerID,
 			};
 		})
-		.catch((err) => HandleErrors("client.fetchGuild", err));
+		.catch((err) => HandleErrors(err));
 };
 
 client.fetchMember = async (guildID, playerID) => {
@@ -52,7 +54,7 @@ client.fetchMember = async (guildID, playerID) => {
 		})
 		.catch((err) => {
 			if (err != "DiscordAPIError: Unknown Member") {
-				HandleErrors(`guild.fetchMember`, err);
+				HandleErrors(err);
 			}
 		});
 };
@@ -75,7 +77,7 @@ client.fetchRole = async (guildID, role_id) => {
 				deleted: role.deleted,
 			};
 		})
-		.catch((err) => HandleErrors("guild.fetchRole", err));
+		.catch((err) => HandleErrors(err));
 };
 
 client.fetchRoles = async (guild_id) => {
@@ -95,9 +97,12 @@ client.fetchRoles = async (guild_id) => {
 	});
 };
 
-const HandleErrors = (src = "config/api/discord.js", err) => {
+const HandleErrors = (err, src = "services/discord.js") => {
 	logger.warn(`[${src}]: ${err}`);
-	return null;
 };
+
+client.on("ready", () => {
+	console.log(`Local Discord Client Ready: ${client.user.username}`);
+});
 
 module.exports = client;

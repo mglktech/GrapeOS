@@ -13,8 +13,7 @@ async function SynchronizeAllMessages(channel) {
 	});
 	for (message of allMessages) {
 		const dragTime = parseMessage(message);
-		new model(dragTime).save()
-		.then(result => {
+		new model(dragTime).save().then((result) => {
 			logger.info(
 				"[HL_DRAGTIME]: Sync : New Drag Time logged for " + dragTime.rp_name
 			);
@@ -24,16 +23,20 @@ async function SynchronizeAllMessages(channel) {
 	}
 }
 
-client.on("ready", async () => {
+client.on("ready", () => {
+	SyncHighlifeDragTimes();
+});
+
+const SyncHighlifeDragTimes = async () => {
 	logger.info("[HL_DRAGTIME]: Syncing Highlife Drag Times...");
 	const channel = await client.channels.fetch(text_live_dragtimes);
 	//console.log(channel);
 	// Synchronization Check can be done using channel.lastMessageID
-	if(!await model.exists({messageID:channel.lastMessageID})) {
+	if (!(await model.exists({ messageID: channel.lastMessageID }))) {
 		await SynchronizeAllMessages(channel);
 	}
 	logger.info("[HL_DRAGTIME]: Sync Complete.");
-});
+};
 
 client.on("message", (message) => {
 	// console.log(

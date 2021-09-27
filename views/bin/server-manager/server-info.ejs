@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%-include("../../partials/head")%>
+
+
+
+<body class="text-light">
+
+    <div class=" d-inline-flex position-fixed p-3 fixed-bottom"><a
+            class="btn btn-secondary btn-lg border rounded border-dark shadow" type="button"
+            href="/bin/fiveM/server/view/all/html"><i class="fa fa-arrow-left"></i></a></div>
+    <div class=" min-vh-100" id="svinfo" style="background: #000000;">
+        <div><img class="img-fluid p-0" id="img-splash-banner" src="<%=svData.vars.get("banner_detail")%>" width="100%">
+        </div>
+        <div class="p-2">
+            <div class="d-flex flex-column align-items-center">
+                <h2 class="text-light m-0"><%=svData.vars.get("sv_projectName")%></h2>
+                <h6 class="text-light m-0"><%=svData._id%></h6>
+                <h6 class="text-light m-0"><%=svData.ip%></h6>
+            </div>
+            <div>
+                <p><%=svData.vars.get("sv_projectDesc")%></p>
+                <div class="d-flex flex-column">
+                    <label class="form-label">Vars:</label>
+                    <pre
+                        class=" bg-dark text-light p-2"><%=JSON.stringify(Object.fromEntries(svData.vars),null,4)%></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+</body>
+
+</html>

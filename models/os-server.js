@@ -1,31 +1,13 @@
-// Gameservers = Associated content for a specific community
-// in the case of Highlife Roleplay, information scrubbed from their discord server is associated with their live server IP.
-// Model relevant player-related content from the discord server like roles,
-// Associate roles with discord accounts
-// Be able to check almost-live up to date information on each player on the server and their associated roles.
-
 const mongoose = require("mongoose");
 
 const Schema = mongoose.Schema;
 
-const modelName = "discord-guild"; // Singular, not sure if capitals are relevant
+const modelName = "os-server"; // Singular, not sure if capitals are relevant
 // make schema, defines structure
 
 const mySchema = new Schema({
-	id: String,
-	name: String,
-	icon: String,
-	splash: String,
-	discoverySplash: String,
-	region: String,
-	memberCount: Number,
-	large: Boolean,
-	deleted: Boolean,
-	features: Array,
-	vanityUrlCode: String,
-	description: String,
-	banner: String,
-	ownerID: String,
+	fivem_server: { type: Schema.Types.ObjectId, ref: "fivem-server" },
+	discord_server: { type: Schema.Types.ObjectId, ref: "discord-server" },
 });
 model.fetchById = (_id) => {
 	//console.log("new method");

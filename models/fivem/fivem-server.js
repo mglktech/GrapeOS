@@ -10,6 +10,7 @@ const modelName = "fivem-server";
 
 const mySchema = new Schema({
 	ip: String,
+	cfxCode: String,
 	resources: [String],
 	enhancedHostSupport: Boolean,
 	icon: String,
@@ -19,59 +20,71 @@ const mySchema = new Schema({
 		of: Object,
 	},
 	online: Boolean,
-	retries:Number,
+	tries: Number,
 });
 
 // create model based on schema
 const model = mongoose.model(modelName, mySchema);
 
 model.fetchAll = () => {
-	return objectify(model.find());
-}
+	return model.find();
+};
 
-model.fetchById = (id) => {
+model.getById = (id) => {
 	//console.log("new method");
-	return objectify(model.findById(id));
+	return model.findById(id);
 };
 model.fetchByIP = (ip) => {
-	return objectify(model.findOne({ ip }));
+	return model.findOne({ ip });
+};
+model.fetchByCfx = (cfxCode) => {
+	return model.findOne({ cfxCode });
 };
 
 model.create = (item) => {
-	return new model(item).save()
-	.then(res => {
+	return new model(item).save().then((res) => {
 		doLog("fivem-server", `New Model Created. ${res._id}`);
 		return res;
-	})
-}
-model.modify = (id,contents) => {
-	model.findByIdAndUpdate(id,contents);
-}
+	});
+};
+model.modify = (id, contents) => {
+	model.findByIdAndUpdate(id, contents);
+};
 
-model.setStatus = (sv, status) => { // sv = found server model, status = Online Status (bool)
+model.setStatus = (sv, status) => {
+	// sv = found server model, status = Online Status (bool)
 	let retries = sv.retries;
-	if(!status) {
+	if (!status) {
 		retries++;
 		let name = sv.vars.sv_projectName || sv._id;
-		console.log(`[fivem-server] -> ${name} has failed to respond after ${retries} retries.`);
-	}
-	else {
+		console.log(
+			`[fivem-server] -> ${name} has failed to respond after ${retries} retries.`
+		);
+	} else {
 		retries = 0;
 	}
-	model.findByIdAndUpdate(sv._id, {status, retries}).exec();
-}
+	model.findByIdAndUpdate(sv._id, { status, retries }).exec();
+};
 
-
-function objectify(item) {
+function objectify(items) {
 	try {
-		item.toObject({flattenMaps:true});
-	}
-	catch {
-		return;
+		let rtn = [];
+		for (let item of items) {
+			rtn.push(item.toObject({ flattenMaps: true }));
+		}
+		return rtn;
+	} catch (err) {
+		console.log(err);
+		try {
+			return items.toObject({ flattenMaps: true });
+		} catch (err) {
+			console.log(err);
+			return items;
+		}
 	}
 }
 
-function doLog(service,text) {
+function doLog(service, text) {
 	let logTxt = `[${service}] -> ${text}`;
 	console.log(logTxt);
 }

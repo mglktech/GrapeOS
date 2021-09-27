@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%-include("../../partials/head")%>
+
+<body>
+    <div class="card textlight bg-dark text-light min-vh-100">
+        <div class="card-header">
+            <h5 class="mb-0">Add Server</h5>
+        </div>
+        <div class="card-body">
+            <div class="py-4">
+                <form id="fetch-ip" class="py-2">
+                    <div class="input-group"><span class="input-group-text">IP:</span><input class="form-control"
+                            id="ip-address-input" type="text"><button class="btn btn-primary" type="submit"><i
+                                class="fa fa-angle-right"></i></button></div>
+                </form>
+                <form id="fetch-cfx">
+                    <div class="input-group"><span class="input-group-text">cfx.re/join/</span><input
+                            class="form-control" id="ip-address-input" type="text"><button class="btn btn-primary"
+                            type="submit"><i class="fa fa-angle-right"></i></button></div>
+                </form>
+                <label id="errLabel" class="form-label text-danger"></label>
+            </div>
+            <div class="border rounded-0 border-success visually-hidden" id="svinfo">
+                <div>
+                    <img class="img-fluid p-0" id="img-splash-banner" src="" width="100%">
+                </div>
+                <div class="p-2" style="background: #000000;">
+                    <div class="d-flex flex-row align-items-center">
+                        <h1 class="text-light m-0" id="sv-title">...</h1>
+                    </div>
+                    <div>
+                        <p id="sv-desc">...</p>
+                        <div class="d-flex flex-column">
+                            <label>Vars</label>
+                            <pre id="sv-vars" class=" bg-dark text-light p-2"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-between py-4">
+                <a class="btn btn-secondary btn-lg" href="/bin/fiveM/server/view/all/html" type="button">
+                    <i class="fa fa-arrow-left"></i>
+                </a>
+                <form method="POST" id="post-form" action="/bin/fiveM/server/add">
+                    <input type="text" hidden id="url" name="url">
+                    <input type="text" hidden id="svData" name="svData">
+                    <button class="btn btn-success btn-lg disabled" type="submit" id="submit-ip">
+                        <i class="fa fa-check"></i>
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+    <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
+
+    <script defer>
+        var result = document.querySelector("#result");
+        const err = (code = null) => {
+            let str = "Error: ";
+            if (!code) {
+                return str + "No server found at IP (400)";
+            }
+            if (code == "ECONNRESET") {
+                return str + `Connection Reset`;
+            }
+            if (code == "ENOTFOUND") {
+                return str + "No server found at IP";
+            }
+            if (code == "ECONNREFUSED") {
+                return str + "Server Connection Refused. (check port)";
+            }
+
+        }
+        const form = document.getElementById("fetch-ip");
+        const cfxForm = document.getElementById("fetch-cfx");
+        const errLabel = document.getElementById("errLabel");
+        const ip = document.getElementById("ip-address-input");
+        const wrapper = document.getElementById("svinfo");
+        const splash = document.getElementById("img-splash-banner");
+        const icon = document.getElementById("img-profile");
+        const title = document.getElementById("sv-title");
+        const sub = document.getElementById("sv-sub");
+        const desc = document.getElementById("sv-desc");
+        const vars = document.getElementById("sv-vars");
+        const btnContinue = document.getElementById("submit-ip");
+        const urlFormInput = document.getElementById("url");
+        const svDataFormInput = document.getElementById("svData");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            errLabel.innerHTML = "";
+            let encoded = encodeURIComponent(ip.value);
+            //console.log(encoded);
+            const svData = await fetch(`/bin/fiveM/server/fetch/${ip.value}`).then(res => res.json());
+            console.log(svData);
+            if (svData.error) {
+                errLabel.innerHTML = err(svData.data.code);
+                return;
+            }
+            updateSvInfo(svData, ip.value);
+        });
+        cfxForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            errLabel.innerHTML = "";
+            let encoded = encodeURIComponent(ip.value);
+            //console.log(encoded);
+            const svData = await fetch(`/bin/fiveM/server/cfxFetch/${ip.value}`).then(res => res.json());
+            console.log(svData);
+            if (svData.error) {
+                errLabel.innerHTML = err(svData.data.code);
+                return;
+            }
+            updateSvInfo(svData, ip.value);
+        });
+        const updateSvInfo = (svInfo, ip) => {
+            console.log(svInfo.data.vars.banner_detail)
+            splash.src = svInfo.data.vars.banner_connecting;
+            title.innerHTML = svInfo.data.vars.sv_projectName;
+            desc.innerHTML = svInfo.data.vars.sv_projectDesc;
+            vars.innerHTML = JSON.stringify(svInfo.data.vars, null, 4);
+            wrapper.classList.remove("visually-hidden");
+            btnContinue.classList.remove("disabled");
+            urlFormInput.value = ip;
+            svDataFormInput.value = JSON.stringify(svInfo.data);
+        }
+    </script>
+</body>
+
+</html>
