@@ -13,7 +13,7 @@ router.get("/server/fetch/:ip", async (req, res) => {
 router.get("/server/cfxFetch/:cfxCode", async (req, res) => {
 	const sv = new FiveMService.Server(req.params.cfxCode);
 	const data = await sv.getCfx();
-	console.log(data);
+	res.json(data);
 });
 
 router.get(
@@ -35,13 +35,11 @@ router.get("/server/add", (req, res) => {
 	res.render("bin/server-manager/server-add");
 });
 router.post("/server/add/", async (req, res) => {
-	let ip = req.body.url;
 	let svData = JSON.parse(req.body.svData);
-	svData.ip = ip;
 	//console.log(`ip: ${ip}`);
 	//console.log(svData);
 	await fiveMServerModel
-		.findOneAndUpdate({ ip }, svData, {
+		.findOneAndUpdate({ EndPoint: svData.EndPoint }, svData, {
 			new: true,
 			upsert: true,
 		})

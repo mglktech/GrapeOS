@@ -39,7 +39,7 @@ const createTask = (task) => {
 	}
 	if (task.cmd == "pingFiveMServerNew") {
 		manager.add(task._id.toString(), task.exp, async function () {
-			timeIt(task.cmd, controller.pingFiveMServer(task.data.id));
+			controller.pingFiveMServer(task.data.id);
 		});
 		console.log(`CRON Task ${task.name} has been created. (pingFiveMServer)`);
 	}
@@ -48,12 +48,7 @@ const createTask = (task) => {
 		console.log(`CRON Task ${task.name} has been created. (pingScrobbler)`);
 	}
 };
-async function timeIt(cmd, func) {
-	let a = Date.now();
-	await func;
-	let b = Date.now();
-	console.log(`[CRON timeIt] [${cmd}] took ${b - a}ms to complete`);
-}
+
 const scheduledTasks = [
 	// {
 	// 	exp: "*/30 * * * * *",

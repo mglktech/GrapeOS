@@ -9,18 +9,38 @@ const Schema = mongoose.Schema;
 const modelName = "fivem-server";
 
 const mySchema = new Schema({
-	ip: String,
-	cfxCode: String,
-	resources: [String],
-	enhancedHostSupport: Boolean,
-	icon: String,
-	server: String,
-	vars: {
-		type: Map,
-		of: Object,
+	EndPoint: {
+		type: String,
+		required: true,
 	},
-	online: Boolean,
-	tries: Number,
+	Data: {
+		clients: Number,
+		gametype: String,
+		hostname: String,
+		mapname: String,
+		iconVersion: Number,
+		sv_maxclients: Number,
+		enhancedHostSupport: Boolean,
+		resources: [String],
+		server: String,
+		vars: {
+			type: Map,
+			of: Object,
+		},
+		selfReportedClients: Number,
+		ownerID: Number,
+		private: Boolean,
+		fallback: Boolean,
+		connectEndPoints: [String],
+		upvotePower: Number,
+		burstPower: Number,
+		support_status: String,
+		svMaxClients: Number,
+		ownerName: String,
+		ownerProfile: String,
+		ownerAvatar: String,
+		lastSeen: String,
+	},
 });
 
 // create model based on schema
@@ -38,7 +58,7 @@ model.fetchByIP = (ip) => {
 	return model.findOne({ ip });
 };
 model.fetchByCfx = (cfxCode) => {
-	return model.findOne({ cfxCode });
+	return model.findOne({ EndPoint: cfxCode });
 };
 
 model.create = (item) => {

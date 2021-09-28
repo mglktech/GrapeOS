@@ -41,6 +41,7 @@ model.setup = async () => {
 	const adminFiles = await model.find({
 		type: "shortcut",
 		"data.requireAdmin": true,
+		"data.desktopVisible": false,
 	});
 	const folder_icon = await model.findOne({ name: "_folder", type: "icon" });
 	let adminFolder = await default_folders(folder_icon._id);

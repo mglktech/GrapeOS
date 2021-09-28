@@ -6,10 +6,14 @@ const modelName = "fivem-player"; // Singular, not sure if capitals are relevant
 // make schema, defines structure
 
 const mySchema = new Schema({
+	id: Number,
 	identifiers: { type: Map, of: String },
 	name: String,
 	server: { type: Schema.Types.ObjectId, ref: "fivem-server" },
-	online: Boolean,
+	online: {
+		type: Boolean,
+		default: true,
+	},
 });
 // create model based on schema
 const model = mongoose.model(modelName, mySchema);
@@ -17,10 +21,7 @@ const model = mongoose.model(modelName, mySchema);
 // assign model constants
 model.create = () => {};
 model.findPlayer = async (playerInfo) => {
-	// find player that matches one of the identifiers
-	const steamID = Object.fromEntries(playerInfo.identifiers).steam;
-	//console.log(discordID);
-	return model.findOneAndUpdate(playerInfo, playerInfo, {
+	return model.findOneAndUpdate({ name: playerInfo.name }, playerInfo, {
 		new: true,
 		upsert: true,
 	});

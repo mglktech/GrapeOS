@@ -27,35 +27,7 @@ class Server {
 				});
 		});
 	}
-	getPlayers() {
-		return new Promise((send, err) => {
-			axios
-				.get(`http://${this.ip}/players.json`, {
-					timeout: this.options.timeout,
-				})
-				.then(function (body) {
-					let players = body.data;
-					send(players);
-				})
-				.catch(function (error) {
-					err(error);
-				});
-		});
-	}
-	getInfo() {
-		return new Promise((send, err) => {
-			axios
-				.get(`http://${this.ip}/info.json`, { timeout: this.options.timeout })
-				.then(function (body) {
-					let info = body.data;
-					info.icon = "";
-					send(info);
-				})
-				.catch(function (error) {
-					err(error);
-				});
-		});
-	}
+
 	// getInfo_prune() {
 	// 	return new Promise((send, err) => {
 	// 		axios

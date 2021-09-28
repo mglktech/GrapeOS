@@ -27,21 +27,65 @@ MGLK API
 Used for getting info from places and responding as JSON 
 */
 
+// const getPlayerInfo = async (id) => {
+// 	let plyD = await playerModel.findById(id);
+// 	//console.log(JSON.stringify(plyD));
+// 	//let activityData = await activityModel.find({ player: plyD }).exec();
+// 	let actD = await activityModel
+// 		.find({ player: plyD })
+// 		.populate("server")
+// 		.sort({ onlineAt: "desc" })
+// 		.exec();
+// 	let svData = {
+// 		hrsInFortnite: 0,
+// 		hrsOnRecord: 0,
+// 	};
+// 	let rec = {
+// 		shifts: [],
+// 	};
+// 	let recs = [];
+// 	for (let act of actD) {
+// 		let [onlineAt, offlineAt] = [
+// 			new Moment(act.onlineAt),
+// 			new Moment(act.offlineAt),
+// 		];
+// 		let diff = offlineAt - onlineAt;
+// 		let two_weeks_ago = Date.now() - 1209600000;
+// 		if (act.onlineAt > two_weeks_ago) {
+// 			svData.hrsInFortnite += Math.floor(diff / 1000 / 60 / 60);
+// 		}
+// 		svData.hrsOnRecord += Math.floor(diff / 1000 / 60 / 60);
+// 		svData.id = act.server.discord.id;
+// 		svData.icon = act.server.discord.icon; // ??? Gonna be a bug here with same player on multiple servers!
+// 		svData.name = act.server.discord.name;
+// 		let this_date = onlineAt.format("DD-MM-YYYY");
+// 		let shift = {
+// 			currentlyOnline: act.currentlyOnline,
+// 			id: act.sv_id,
+// 			onlineAt: onlineAt.format("HH:mm"),
+// 			offlineAt: offlineAt.format("HH:mm"),
+// 			duration: timingFuncs.parseTime(diff),
+// 		};
+// 		if (recs.length > 0) {
+// 			if (this_date == recs[recs.length - 1].date) {
+// 				rec.shifts.push(shift);
+// 				continue;
+// 			}
+// 		}
+// 		rec = {
+// 			date: this_date,
+// 			shifts: [shift],
+// 		};
+// 		recs.push(rec);
+// 	}
+// 	//console.log(JSON.stringify(recs));
+// 	return { plyD, recs, svData };
+// };
 const getPlayerInfo = async (id) => {
-	let plyD = await playerModel
-		.findById(id)
-		.populate({
-			path: "discord.roles",
-			options: {
-				select: "name color",
-				sort: { rawPosition: "desc" },
-			},
-		})
-		.exec();
+	let plyD = await FiveMPlayerModel.findById(id);
 	//console.log(JSON.stringify(plyD));
 	//let activityData = await activityModel.find({ player: plyD }).exec();
-	let actD = await activityModel
-		.find({ player: plyD })
+	let actD = await FiveMActivityModel.find({ player: plyD })
 		.populate("server")
 		.sort({ onlineAt: "desc" })
 		.exec();
@@ -64,12 +108,12 @@ const getPlayerInfo = async (id) => {
 			svData.hrsInFortnite += Math.floor(diff / 1000 / 60 / 60);
 		}
 		svData.hrsOnRecord += Math.floor(diff / 1000 / 60 / 60);
-		svData.id = act.server.discord.id;
-		svData.icon = act.server.discord.icon; // ??? Gonna be a bug here with same player on multiple servers!
-		svData.name = act.server.discord.name;
+		svData.id = act.server.EndPoint; //act.server.discord.id;
+		svData.icon = act.server.Data.iconVersion; //act.server.discord.icon; // ??? Gonna be a bug here with same player on multiple servers!
+		svData.name = act.server.Data.vars.get("sv_projectName"); //act.server.discord.name;
 		let this_date = onlineAt.format("DD-MM-YYYY");
 		let shift = {
-			currentlyOnline: act.currentlyOnline,
+			online: act.online,
 			id: act.sv_id,
 			onlineAt: onlineAt.format("HH:mm"),
 			offlineAt: offlineAt.format("HH:mm"),

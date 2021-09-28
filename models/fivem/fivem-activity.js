@@ -32,28 +32,29 @@ model.create = (params) => {
 };
 
 model.getAllOnline = (server) => {
-	return model.find({ server, online: true });
+	return model
+		.find({ server, online: true })
+		.populate("player")
+		.sort({ sv_id: "desc" });
 };
 
 model.finish = (_id) => {
 	const now = Date.now();
-	return model
+	model
 		.findByIdAndUpdate(_id, {
 			online: false,
 			offlineAt: now,
 		})
-		.populate("player")
-		.populate("server")
-		.then((res) => {
-			console.log(`${res.player.name} has logged out of ${res.server.ip}`);
-		});
-};
-model.finishAll = async (server) => {
-	const records = await model.getAllOnline(server);
-	logger.event("Sending " + records.length + " players offline...");
-	for (let r of records) {
-		model.finish(r._id);
-	}
+		.exec();
+	// .populate("player")
+	// .populate("server")
+	// .then((res) => {
+	// 	console.log(
+	// 		`${res.player.name} has logged out of ${res.server.Data.vars.get(
+	// 			"sv_projectName"
+	// 		)}`
+	// 	);
+	// });
 };
 
 module.exports = model;

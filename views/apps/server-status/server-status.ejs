@@ -1,68 +1,37 @@
+<!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>GrapeOS</title>
-    <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Fira+Code:400,500,700">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono:300,500,700">
-    <link rel="stylesheet" href="/assets/font-awesome/css/font-awesome.css">
-    <link rel="stylesheet" href="/assets/css/bootstrap.css">
-    <link rel="stylesheet" href="/assets/css/styles.css">
-    <style>
-        
-
-
-        ::-webkit-scrollbar {
-            top: 35px;
-            width: 1rem;
-            background-color: #212529;
-        }
-
-        :-webkit-scrollbar-track {
-            background-color: #212529;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            border-radius: 10px;
-            background-color: rgba(38, 21, 67, 1);
-        }
-
-        ::-webkit-scrollbar-corner {
-            background: transparent;
-        }
-    </style>
-</head>
+<%-include("../../partials/head")%>
 
 <body style="background:black;">
-    <div class="container text-light">
-        <div class="row">
-            <div class="col p-0"><img class="img-fluid p-0" id="img-splash-banner"
-                    src="https://cdn.discordapp.com/splashes/<%=sv_info.discord.id%>/<%=sv_info.discord.splash%>.png?size=512"
+    <div class="container text-light bg-dark">
+        <div class="row ">
+            <div class="col p-0 ">
+                <img class="img-fluid p-0" id="img-splash-banner" src="<%=svInfo.Data.vars.get("banner_detail")%>"
                     width="100%">
-                <div class="row translate-middle-y mx-2">
-                    <div class="col p-0 col-3"><img
-                            class="img-fluid border rounded-circle border-secondary p-0 rounded-circle"
-                            src="https://cdn.discordapp.com/icons/<%=sv_info.discord.id%>/<%=sv_info.discord.icon%>.png?size=512">
+                <div class="row m-0 p-0">
+                    <div class="col p-0 col-3">
+                        <img class="img-fluid border-secondary p-2"
+                            src="http://servers-live.fivem.net/servers/icon/<%=svInfo.EndPoint%>/<%=svInfo.Data.iconVersion%>.png">
                     </div>
                     <div class="col d-flex flex-column justify-content-center">
-                        <h1 class="text-light m-0"><%=sv_info.discord.name%></h1><span
-                            class="text-light"><%=sv_info.fiveM.vars.get("Discord")%></span>
+                        <h1 class="text-light m-0"><%=svInfo.Data.vars.get("sv_projectName")%></h1><span
+                            class="text-light"><%=svInfo.Data.vars.get("Discord")%></span>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="row translate-middle-y mt-4">
+        <div class="row mt-4">
             <div class="col col-12">
-                <p><%=sv_info.discord.description%><br></p>
-                <div class="d-flex justify-content-between align-items-center"><a class="btn btn-primary btn-lg" role="button"
-                        id="bntServerInfo" href="/apps/serverStatus/<%=sv_info.discord.vanityUrlCode%>/info"><i
+                <p><%=svInfo.Data.vars.get("sv_projectDesc")%><br></p>
+                <div class="d-flex justify-content-between align-items-center"><a class="btn btn-primary btn-lg"
+                        role="button" id="bntServerInfo" href="/apps/serverStatus/<%=svInfo.EndPoint%>/info"><i
                             class="fa fa-info-circle"></i></a>
-                            
-                    <div class="d-inline-flex flex-column text-center"><span id="playerCount">...</span><span id="queueCount"></span></div><a
-                        class="btn btn-secondary btn-lg" role="button" id="btnServerSearch"
-                        href="/apps/serverStatus/<%=sv_info.discord.vanityUrlCode%>/search"><i class="fa fa-search"></i></a>
+
+                    <div class="d-inline-flex flex-column text-center"><span id="playerCount">...</span><span
+                            id="queueCount"></span></div><a class="btn btn-secondary btn-lg" role="button"
+                        id="btnServerSearch" href="/apps/serverStatus/<%=svInfo.EndPoint%>/search"><i
+                            class="fa fa-search"></i></a>
                 </div>
             </div>
         </div>
@@ -70,39 +39,14 @@
             <div class="col"><span>Currently Online</span></div>
         </div>
         <div class="col" id="playerRowWrapper"></div>
-        
+
     </div>
     <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
-    
+
     <script>
         let wrapper = document.querySelector("#playerRowWrapper");
         let playerCount = document.querySelector("#playerCount");
-        let queueCount = document.querySelector("#queueCount");
-        //Localized dictionary style
-        //timeago.format('2016-06-12', 'test_local');
-
-        let queueCountTemplate = (players,maxClients,queue) => {
-            
-            if(players > -1) {
-                if(queue > -1) {
-                    if(queue == 0) {
-                        
-                    }
-                    if(queue > 0) {
-                        return `<div class="d-inline-flex flex-column text-center text-warning"><span
-                            id="playerCount">${players}/${maxClients}</span><span id="queueCount">${queue} in Queue</span></div>`
-                    }
-                }
-                return `<div class="d-inline-flex flex-column text-center text-success"><span
-                            id="playerCount">${players}/${maxClients}</span></div>`
-
-                
-            }
-            return;
-            
-        }
-
-        let playerRowTemplate = (id, sv_id, name, time) => {
+        let playerRowTemplate = (_id, sv_id, name, time) => {
             return `<div class="d-flex flex-row justify-content-between py-1" id="PlayerRow" style="border-top-width: 1px;border-top-style: solid;">
                 <div class="text-truncate">
                     <span class="pr-2">${sv_id}</span>
@@ -110,45 +54,39 @@
                 </div>
                 <div class="d-inline-flex flex-row">
                     <span class="pr-2 text-nowrap">${time}</span>
-                <a class="btn btn-primary" role="button" id="btnUserProfile" href="/apps/serverStatus/players/${id}/info"><i class="fa fa-user"></i></a>
+                <a class="btn btn-primary" role="button" id="btnUserProfile" href="/apps/serverStatus/players/${_id}/info"><i class="fa fa-user"></i></a>
                     </div>
-                
-                
                 </div>`;
         }
+        getPlayers();
         async function getPlayers() {
-            const players = await fetch("/api/servers/<%=sv_info.discord.vanityUrlCode%>/playerInfo").then(resp => resp.json());
-            const svInfo = await fetch("/api/servers/<%=sv_info.discord.vanityUrlCode%>/serverInfo").then(resp => resp.json());
-            if(svInfo.online) {
-                if(svInfo.maxClients) {
-                    playerCount.className = "text-success";
-                    playerCount.innerHTML = `${players.length} / ${svInfo.maxClients}`; 
-                }
-                if(svInfo.queue > -1) {     
-                    queueCount.innerHTML = `${svInfo.queue} in Queue`;
-                    if(svInfo.queue == 0) {
-                        queueCount.className = "text-success";
-                    }
-                    if(svInfo.queue > 0 ) {
-                        queueCount.className = "text-warning";
-                    }
-                }
-                
-            }
-            if(!svInfo.online) {
-                playerCount.className = "text-danger";
-                playerCount.innerHTML = "Server Offline";
-            }
+            const activities = await fetch("/apps/serverStatus/<%=svInfo.EndPoint%>/activity").then(resp => resp
+                .json());
+            playerCount.innerHTML = `${activities.length}/<%=svInfo.Data.sv_maxclients%>`;
+            console.log(activities);
             wrapper.innerHTML = "";
-            //console.log(players);
-            for(let player of players) {
-                //let time = timeago.format(player.joined,"local");
-                let playerRow = playerRowTemplate(player.id,player.sv_id,player.name,player.time);
+            for (activity of activities) {
+                let time = parseTime(Date.now() - activity.onlineAt);
+                let playerRow = playerRowTemplate(activity.player._id, activity.sv_id, activity.player.name, time);
                 wrapper.innerHTML += playerRow;
             }
+
+        }
+        parseTime = (msec) => {
+            // Ref: https://stackoverflow.com/questions/1787939/check-time-difference-in-javascript
+            var hh = Math.floor(msec / 1000 / 60 / 60);
+            msec -= hh * 1000 * 60 * 60;
+            var mm = Math.floor(msec / 1000 / 60);
+            msec -= mm * 1000 * 60;
+            var ss = Math.floor(msec / 1000);
+            msec -= ss * 1000;
+            if (hh > 0) {
+                return `${hh}h ${mm}m`;
+            } else if (mm > 0) {
+                return `${mm}m`;
+            }
+            return `${ss}s`;
         };
-        
-        getPlayers();
         window.setInterval(getPlayers, 10000);
     </script>
 </body>
