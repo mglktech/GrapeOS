@@ -1,30 +1,54 @@
 let router = require("express").Router();
 const db = require("../../config/db");
 const api = require("../../controllers/api");
+const FiveMServerModel = require("../../models/fivem/fivem-server");
+const FiveMPlayerModel = require("../../models/fivem/fivem-player");
+const FiveMActivityModel = require("../../models/fivem/fivem-activity");
 const use = (fn) => (req, res, next) => {
 	Promise.resolve(fn(req, res, next)).catch(next);
 };
 router.get(
-	"/:vUrlCode",
+	"/:cfxCode",
 	use(async (req, res) => {
-		let sv_info = await db.getServerByVUrl(req.params.vUrlCode);
-		res.render("apps/server-status/server-status", { sv_info });
+		let svInfo = await FiveMServerModel.fetchByCfx(req.params.cfxCode);
+		//let activity = await FiveMActivityModel.getAllOnline(svInfo._id);
+		res.render("apps/server-status/server-status", { svInfo });
 	})
 );
 router.get(
-	"/:vUrlCode/info",
+	"/:cfxCode/activity",
 	use(async (req, res) => {
-		let sv_info = await db.getServerByVUrl(req.params.vUrlCode);
+		let svInfo = await FiveMServerModel.fetchByCfx(req.params.cfxCode);
+		let activity = await FiveMActivityModel.getAllOnline(svInfo._id);
+		res.json(activity);
+		//let sv_info = await db.getServerByVUrl(req.params.vUrlCode);
 		// deliver as Information window
-		res.render("pages/error", {referer: req.headers.referer,code:404, message:"We're still working on this page!"});
 	})
 );
+
 router.get(
-	"/:vUrlCode/search",
+	"/:cfxCode/info",
 	use(async (req, res) => {
-		let sv_info = await db.getServerByVUrl(req.params.vUrlCode);
+		//let sv_info = await db.getServerByVUrl(req.params.vUrlCode);
+		// deliver as Information window
+		res.render("pages/error", {
+			referer: req.headers.referer,
+			code: 404,
+			message: "We're still working on this page!",
+		});
+	})
+);
+
+router.get(
+	"/:cfxCode/search",
+	use(async (req, res) => {
+		//let sv_info = await db.getServerByVUrl(req.params.vUrlCode);
 		// deliver as searchable content window
-		res.render("pages/error", {referer: req.headers.referer,code:404, message:"We're still working on this page!"});
+		res.render("pages/error", {
+			referer: req.headers.referer,
+			code: 404,
+			message: "We're still working on this page!",
+		});
 	})
 );
 
@@ -41,4 +65,5 @@ router.get(
 		res.render("apps/server-status/player-info", data);
 	})
 );
+
 module.exports = router;
