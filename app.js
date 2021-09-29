@@ -9,6 +9,7 @@ const passport = require("passport");
 const logger = require("emberdyn-logger");
 
 require("ejs");
+
 require("dotenv").config();
 require("./config/db");
 require("./config/strategies/discordStrategy");
