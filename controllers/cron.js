@@ -22,18 +22,19 @@ const pingFiveMServer = async (serverId) => {
 	const srv = new FiveMService.Server(FiveMServer.EndPoint);
 	let a1 = Date.now();
 	const serverInfo = await srv.getCfx().catch((err) => {
+		let b = Date.now();
 		if (err.code) {
 			console.log(
-				`Error: No Server Info recieved for ${FiveMServer.Data.vars.get(
-					"sv_projectName"
-				)} [${FiveMServer.EndPoint}] [${err.code}]`
+				`[${FiveMServer.EndPoint}][${b - a1}ms] [${
+					err.code
+				}] [${FiveMServer.Data.vars.get("sv_projectName")}]`
 			);
 			return;
 		}
 		console.log(
-			`Error: No Server Info recieved for ${FiveMServer.Data.vars.get(
-				"sv_projectName"
-			)} [${FiveMServer.EndPoint}] [${err}]`
+			`[${FiveMServer.EndPoint}][${
+				b - a1
+			}ms] [${err}] [${FiveMServer.Data.vars.get("sv_projectName")}]`
 		);
 		return;
 	});
@@ -117,7 +118,7 @@ const pingFiveMServer = async (serverId) => {
 	}
 	let b = Date.now();
 	console.log(
-		`[pingFiveMServerNew] - [${FiveMServer.EndPoint}][${initPing}ms][t:${
+		`[${FiveMServer.EndPoint}][${initPing}ms][t:${
 			playerInfo.length
 		} new:${newPlayers} in:${newActivities} out:${oldActivities}] => ${
 			b - a
