@@ -24,12 +24,16 @@ const pingFiveMServer = async (serverId) => {
 	const serverInfo = await srv.getCfx().catch((err) => {
 		if (err.code) {
 			console.log(
-				`Error: No Server Info recieved for ${FiveMServer.EndPoint} [${err.code}]`
+				`Error: No Server Info recieved for ${FiveMServer.Data.vars.get(
+					"sv_projectName"
+				)} [${FiveMServer.EndPoint}] [${err.code}]`
 			);
 			return;
 		}
 		console.log(
-			`Error: No Server Info recieved for ${FiveMServer.EndPoint} [${err}]`
+			`Error: No Server Info recieved for ${FiveMServer.Data.vars.get(
+				"sv_projectName"
+			)} [${FiveMServer.EndPoint}] [${err}]`
 		);
 		return;
 	});
@@ -113,7 +117,7 @@ const pingFiveMServer = async (serverId) => {
 	}
 	let b = Date.now();
 	console.log(
-		`[pingFiveMServerNew] - [${initPing}ms][t:${
+		`[pingFiveMServerNew] - [${FiveMServer.EndPoint}][${initPing}ms][t:${
 			playerInfo.length
 		} new:${newPlayers} in:${newActivities} out:${oldActivities}] => ${
 			b - a
