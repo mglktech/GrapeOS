@@ -1,6 +1,7 @@
 const FiveMServerModel = require("../models/fivem/fivem-server");
 const FiveMPlayerModel = require("../models/fivem/fivem-player");
 const FiveMActivityModel = require("../models/fivem/fivem-activity");
+const FiveMService = require("../services/fiveM");
 const maxRetries = process.env.maxRetries || 3;
 
 const pingFiveMServers = () => {
@@ -13,7 +14,6 @@ const pingFiveMServers = () => {
 
 const pingFiveMServer = async (serverId) => {
 	let a = Date.now();
-	const FiveMService = require("../services/fiveM");
 	const FiveMServer = await FiveMServerModel.getById(serverId);
 	if (!FiveMServer) {
 		console.log(`Error: No Server found for _id:${serverId}`);
@@ -22,10 +22,15 @@ const pingFiveMServer = async (serverId) => {
 	const srv = new FiveMService.Server(FiveMServer.EndPoint);
 	let a1 = Date.now();
 	const serverInfo = await srv.getCfx().catch((err) => {
+		if (err.code) {
+			console.log(
+				`Error: No Server Info recieved for ${FiveMServer.EndPoint} [${err.code}]`
+			);
+			return;
+		}
 		console.log(
-			`Error: No Server Info recieved for ${FiveMServer.EndPoint} [${err.code}]`
+			`Error: No Server Info recieved for ${FiveMServer.EndPoint} [${err}]`
 		);
-		return;
 	});
 	if (!serverInfo) {
 		return;
