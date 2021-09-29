@@ -1,7 +1,7 @@
 let router = require("express").Router();
 const fiveMServerModel = require("../../models/fivem/fivem-server");
 const FiveMService = require("../../services/fiveM");
-
+const isAdmin = require("../../config/auth").isAdmin;
 router.get("/server/fetch/:ip", async (req, res) => {
 	const sv = new FiveMService.Server(req.params.ip);
 	let json = {};
@@ -16,25 +16,21 @@ router.get("/server/cfxFetch/:cfxCode", async (req, res) => {
 	res.json(data);
 });
 
-router.get(
-	// isAdmin
-	"/server/get/:id/:format",
-	async (req, res) => {
-		let file = await fiveMServerModel.findById(req.params.id);
-		let format = req.params.format;
-		//console.log(file);
-		if (format === "html") {
-			res.render("bin/server-manager/server-info", { svData: file });
-		}
-		if (format === "json") {
-			res.json(file);
-		}
+router.get("/server/get/:id/:format", isAdmin, async (req, res) => {
+	let file = await fiveMServerModel.findById(req.params.id);
+	let format = req.params.format;
+	//console.log(file);
+	if (format === "html") {
+		res.render("bin/server-manager/server-info", { svData: file });
 	}
-);
-router.get("/server/add", (req, res) => {
+	if (format === "json") {
+		res.json(file);
+	}
+});
+router.get("/server/add", isAdmin, (req, res) => {
 	res.render("bin/server-manager/server-add");
 });
-router.post("/server/add/", async (req, res) => {
+router.post("/server/add/", isAdmin, async (req, res) => {
 	let svData = JSON.parse(req.body.svData);
 	//console.log(`ip: ${ip}`);
 	//console.log(svData);
@@ -49,20 +45,16 @@ router.post("/server/add/", async (req, res) => {
 	res.redirect("/bin/fiveM/server/view/all/html");
 });
 
-router.get(
-	// isAdmin
-	"/server/view/all/:responseType",
-	async (req, res) => {
-		const responseType = req.params.responseType;
-		let allServers = (await fiveMServerModel.fetchAll()) || [];
-		if (responseType == "html") {
-			res.render("bin/server-manager/server-view", {
-				servers: allServers,
-			});
-		}
-		if (responseType == "json") {
-			res.json(allServers);
-		}
+router.get("/server/view/all/:responseType", isAdmin, async (req, res) => {
+	const responseType = req.params.responseType;
+	let allServers = (await fiveMServerModel.fetchAll()) || [];
+	if (responseType == "html") {
+		res.render("bin/server-manager/server-view", {
+			servers: allServers,
+		});
 	}
-);
+	if (responseType == "json") {
+		res.json(allServers);
+	}
+});
 module.exports = router;

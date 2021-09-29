@@ -74,6 +74,9 @@ header.masthead .bg-circle-4 {
 	top: -5rem;
 	right: 35%;
 }
+.bg-black {
+	background: #000000;
+}
 
 .display-4 {
 	font-size: calc(1.475rem + 2.7vw);
@@ -113,14 +116,14 @@ header.masthead .bg-circle-4 {
 	max-width: 20vw;
 }
 
-.div-icon {
+/* .div-icon {
 	display: flex;
 	padding: 5%;
-	max-width: 100px;
-	max-height: 100px;
+	width: 100px;
+	height: 100px;
 	flex-direction: column;
 	align-items: center;
-}
+} */
 
 .navbar-bottom {
 	display: flex;
@@ -181,15 +184,16 @@ a:hover {
 }
 
 .shortcut-text {
+	color: white;
 	font-size: 14px;
 	line-height: 16px;
 	width: 75px;
 }
 
 .shortcut-icon {
-	font-size: 3rem;
-	height: 50px;
-	width: 75px;
+	font-size: 3.5rem;
+	height: 4rem;
+	width: 4rem;
 }
 
 .shortcut-container {

@@ -3,6 +3,14 @@ const FiveMPlayerModel = require("../models/fivem/fivem-player");
 const FiveMActivityModel = require("../models/fivem/fivem-activity");
 const maxRetries = process.env.maxRetries || 3;
 
+const pingFiveMServers = () => {
+	FiveMServerModel.find({ "Flags.tracked": true }).then((servers) => {
+		servers.forEach((server) => {
+			pingFiveMServer(server._id);
+		});
+	});
+};
+
 const pingFiveMServer = async (serverId) => {
 	let a = Date.now();
 	const FiveMService = require("../services/fiveM");
@@ -80,7 +88,7 @@ const pingFiveMServer = async (serverId) => {
 		let match = playerInfo.some((ply) => {
 			return (
 				ply.identifiers.get("license") ==
-				activity.player.identifiers.get("license")
+					activity.player.identifiers.get("license") && ply.id == activity.sv_id
 			);
 		});
 		//console.log(match);
@@ -147,4 +155,4 @@ async function timeIt(cmd, svName, func) {
 	console.log(`[CRON timeIt] [${cmd} - ${svName}] took ${b - a}ms to complete`);
 }
 
-module.exports = { pingFiveMServer };
+module.exports = { pingFiveMServer, pingFiveMServers };

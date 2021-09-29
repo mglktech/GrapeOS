@@ -31,9 +31,9 @@ const syncTaskToEnabledFlag = (task) => {
 };
 
 const createTask = (task) => {
-	if (task.cmd == "pingFiveMServer") {
+	if (task.cmd == "pingFiveMServers") {
 		manager.add(task._id.toString(), task.exp, function () {
-			api.fivem_cron_get(task.data.id);
+			controller.pingFiveMServers();
 		});
 		console.log(`CRON Task ${task.name} has been created. (pingFiveMServer)`);
 	}

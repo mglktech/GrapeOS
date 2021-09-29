@@ -13,6 +13,10 @@ const mySchema = new Schema({
 		type: String,
 		required: true,
 	},
+	Flags: {
+		tracked: Boolean,
+		public: Boolean,
+	},
 	Data: {
 		clients: Number,
 		gametype: String,
