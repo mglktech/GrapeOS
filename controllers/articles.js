@@ -9,6 +9,7 @@ const md = require("markdown-it")({
 
 const test = async (req, res) => {
 	console.log(req.isAuthenticated());
+
 	let file = fs.readFileSync("./test_.md");
 	//console.log(file.toString());
 	let content = md.render(file.toString());
