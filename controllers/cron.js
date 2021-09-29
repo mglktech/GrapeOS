@@ -31,6 +31,7 @@ const pingFiveMServer = async (serverId) => {
 		console.log(
 			`Error: No Server Info recieved for ${FiveMServer.EndPoint} [${err}]`
 		);
+		return;
 	});
 	if (!serverInfo) {
 		return;
