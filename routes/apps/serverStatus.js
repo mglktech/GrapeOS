@@ -11,6 +11,10 @@ router.get(
 	"/:cfxCode",
 	use(async (req, res) => {
 		let svInfo = await FiveMServerModel.fetchByCfx(req.params.cfxCode);
+		if (!svInfo) {
+			doError(res, "Player Not Found");
+			return;
+		}
 		//let activity = await FiveMActivityModel.getAllOnline(svInfo._id);
 		res.render("apps/server-status/server-status", { svInfo });
 	})
@@ -56,6 +60,10 @@ router.get(
 	"/players/:id/info",
 	use(async (req, res) => {
 		let collectedData = await api.getPlayerInfo(req.params.id);
+		if (!collectedData) {
+			doError(res, "Player Not Found");
+			return;
+		}
 		let data = {
 			referer: req.headers.referer,
 			playerData: collectedData.plyD,
@@ -65,5 +73,13 @@ router.get(
 		res.render("apps/server-status/player-info", data);
 	})
 );
+
+const doError = (res, msg) => {
+	res.render("pages/error", {
+		referer: req.headers.referer,
+		code: 404,
+		message: "Player Not Found",
+	});
+};
 
 module.exports = router;
