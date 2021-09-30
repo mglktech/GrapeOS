@@ -12,7 +12,7 @@ router.get(
 	use(async (req, res) => {
 		let svInfo = await FiveMServerModel.fetchByCfx(req.params.cfxCode);
 		if (!svInfo) {
-			doError(res, "Player Not Found");
+			doError(req, res, 404, "Server Not Found");
 			return;
 		}
 		//let activity = await FiveMActivityModel.getAllOnline(svInfo._id);
@@ -35,11 +35,8 @@ router.get(
 	use(async (req, res) => {
 		//let sv_info = await db.getServerByVUrl(req.params.vUrlCode);
 		// deliver as Information window
-		res.render("pages/error", {
-			referer: req.headers.referer,
-			code: 404,
-			message: "We're still working on this page!",
-		});
+		doError(req, res, 404, "We're still working on this page!");
+		return;
 	})
 );
 
@@ -48,11 +45,8 @@ router.get(
 	use(async (req, res) => {
 		//let sv_info = await db.getServerByVUrl(req.params.vUrlCode);
 		// deliver as searchable content window
-		res.render("pages/error", {
-			referer: req.headers.referer,
-			code: 404,
-			message: "We're still working on this page!",
-		});
+		doError(req, res, 404, "We're still working on this page!");
+		return;
 	})
 );
 
@@ -61,7 +55,7 @@ router.get(
 	use(async (req, res) => {
 		let collectedData = await api.getPlayerInfo(req.params.id);
 		if (!collectedData) {
-			doError(res, "Player Not Found");
+			doError(req, res, 404, "Player Not Found");
 			return;
 		}
 		let data = {
@@ -74,11 +68,11 @@ router.get(
 	})
 );
 
-const doError = (res, msg) => {
+const doError = (req, res, code = 404, message) => {
 	res.render("pages/error", {
 		referer: req.headers.referer,
-		code: 404,
-		message: msg,
+		code,
+		message,
 	});
 };
 

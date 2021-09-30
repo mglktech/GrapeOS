@@ -83,6 +83,9 @@ Used for getting info from places and responding as JSON
 // };
 const getPlayerInfo = async (id) => {
 	let plyD = await FiveMPlayerModel.findById(id);
+	if (!plyD) {
+		return;
+	}
 	//console.log(JSON.stringify(plyD));
 	//let activityData = await activityModel.find({ player: plyD }).exec();
 	let actD = await FiveMActivityModel.find({ player: plyD })
