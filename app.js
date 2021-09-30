@@ -1,6 +1,7 @@
+require("dotenv").config();
 const express = require("express");
 const path = require("path");
-const morgan = require("morgan")("dev");
+const morgan = require("morgan")(process.env.morgan_logLevel);
 const PORT = process.env.PORT || 5000;
 const CONCURRENCY = process.env.WEB_CONCURRENCY || 1;
 const session = require("express-session");
@@ -10,7 +11,6 @@ const logger = require("emberdyn-logger");
 
 require("ejs");
 
-require("dotenv").config();
 require("./config/db");
 require("./config/strategies/discordStrategy");
 require("./services/discord");
