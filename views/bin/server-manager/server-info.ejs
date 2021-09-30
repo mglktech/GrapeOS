@@ -26,7 +26,8 @@
         </div>
         <div class="p-2">
             <p><%=svData.Data.vars.get("sv_projectDesc")%></p>
-            <div class="d-flex justify-content-evenly"><a class="btn btn-success" role="button" href="/">Tracked</a><a
+            <div class="d-flex justify-content-evenly"><a class="btn btn-<%if(svData.Flags.tracked){%>success<%} else {%>danger<%}%>" role="button"
+                    href="/bin/fiveM/server/<%=svData._id%>/toggleTracking">Tracked</a><a
                     class="btn btn-danger disabled" role="button" href="/">Featured</a></div>
             <div class="d-flex flex-column"><label class="form-label">Data:</label>
                 <pre class=" bg-dark text-light p-2"><%=JSON.stringify(svData.Data,null,4)%></pre>

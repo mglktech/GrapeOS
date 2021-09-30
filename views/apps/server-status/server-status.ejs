@@ -52,21 +52,22 @@
                     </div>
                 </div>`;
             }
+            <%if(svInfo.Flags.tracked) {%>
             getPlayers();
             async function getPlayers() {
-                const activities = await fetch("/apps/serverStatus/<%=svInfo.EndPoint%>/activity").then(resp => resp
+            const activities = await fetch("/apps/serverStatus/<%=svInfo.EndPoint%>/activity").then(resp => resp
             .json());
             playerCount.innerHTML = `${activities.length}/<%=svInfo.Data.sv_maxclients%>`;
             //console.log(activities);
             wrapper.innerHTML = "";
             for (activity of activities) {
             let time = parseTime(Date.now() - activity.onlineAt);
-            let playerRow = playerRowTemplate(activity.player._id, activity.sv_id, activity.player.name,
-            time);
+            let playerRow = playerRowTemplate(activity.player._id, activity.sv_id, activity.player.name,time);
             wrapper.innerHTML += playerRow;
             }
-
             }
+            window.setInterval(getPlayers, 10000);
+            <%}%>
             parseTime = (msec) => {
             // Ref: https://stackoverflow.com/questions/1787939/check-time-difference-in-javascript
             var hh = Math.floor(msec / 1000 / 60 / 60);
@@ -82,7 +83,7 @@
             }
             return `${ss}s`;
             };
-            window.setInterval(getPlayers, 10000);
+            
             </script>
 </body>
 
