@@ -2,13 +2,31 @@ let router = require("express").Router();
 const fiveMServerModel = require("../../models/fivem/fivem-server");
 const FiveMService = require("../../services/fiveM");
 const isAdmin = require("../../config/auth").isAdmin;
-router.get("/server/fetch/:ip", async (req, res) => {
-	const sv = new FiveMService.Server(req.params.ip);
-	let json = {};
-	let data = await sv
-		.getInfo()
-		.then((data) => res.json({ error: false, data }))
-		.catch((err) => res.json({ error: true, data: err }));
+
+// router.get("/server/fetch/:ip", async (req, res) => {
+// 	const sv = new FiveMService.Server(req.params.ip);
+// 	let json = {};
+// 	let data = await sv
+// 		.getInfo()
+// 		.then((data) => res.json({ error: false, data }))
+// 		.catch((err) => res.json({ error: true, data: err }));
+// });
+
+router.get("/server/:id/toggleTracking", isAdmin, async (req, res) => {
+	let file = await fiveMServerModel.findById(req.params.id);
+	if (!file) {
+		// no file
+		return;
+	}
+	let opp = !file.Flags.tracked;
+	let updatedFile = await fiveMServerModel.findByIdAndUpdate(
+		file._id,
+		{
+			"Flags.tracked": opp,
+		},
+		{ new: true }
+	);
+	res.redirect(`/bin/fiveM/server/get/${req.params.id}/html`);
 });
 router.get("/server/cfxFetch/:cfxCode", async (req, res) => {
 	const sv = new FiveMService.Server(req.params.cfxCode);
