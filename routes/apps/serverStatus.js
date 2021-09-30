@@ -78,7 +78,7 @@ const doError = (res, msg) => {
 	res.render("pages/error", {
 		referer: req.headers.referer,
 		code: 404,
-		message: "Player Not Found",
+		message: msg,
 	});
 };
 
